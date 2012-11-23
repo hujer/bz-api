@@ -1,0 +1,1368 @@
+HOST: http://bandzone.cz/
+
+--- BZ API v.0.2 ---
+---
+Basics
+--
+API funguje read-only i bez header fields Client-Id a Client-Key.<br>
+Pro prihlasovani a dalsi funkce je nutno mit platnou kombinaci Client-Id a Client-Key.<br>
+Po prihlaseni je pro identifikaci uzivatele nutno posilat dalsi header User-Token - id aktivni session.<br>
+Pokud je aktivni session, lze misto publicid uzivatele pouzit specialni "_me", ktere znamena "prave prihlaseny user".<br>
+Access levels: R - read (public), W - write (Client-Id + Client-Key), S - session (lze pouzit jen pokud je prihlaseny user, Client-Id + Client-Key + User-Token)
+
+Strankovani vypisu
+--
+Strankovani ovlada parametr page, zaciname od jedne do totalPages.
+
+Write access
+--
+Všechny zapisující requesty musí být s nastavenými headery Client-Id a Client-Key.<br>
+Data je možné posílat jako application/x-www-form-urlencoded, multipart/form-data nebo application/json. Příklady jsou většinou uvedeny v JSON kvůli čitelnosti.
+
+Error responses
+--
+TODO
+
+
+Changelog
+--
+2012-11-22<br>
+- POST /api.session/ nyní vrací data uživatele v response v klíči user (stejně jako GET /api.session/session-id/)<br>
+- Zprovozněno fulltext vyhledávání v api.fan-list, api.band-list, api.gig-list, api.venue-list<br>
+- Zprovozněno filtrování dle startDate, endDate v api.gig-list + doc update<br>
+- Doc fix: POST /api.session/ vrací při vytvoření session status 201<br>
+- Doc update: Přidána indikace access levelu pro requesty<br>
+- Update: Ke všem response objektům přidán unikátní klíč id a type (id objektu a jeho typ - fan, band, album - zde jeste id neni, gig, venue, track). Id je unikátní napříč objekty<br>
+- Update: u GET /api.album/id/ zmeněn puvodni klic "type" na "media"<br>
+- Zprovozněn GET /api.band/publicid/track-list/ + náhledový výpis u GET /api.band/publicid/<br>
+- Update: Přidán klíč venue u GET /api.gig/id/ pro identifikaci klubu<br>
+- Registrace draft: POST /api.register/, PUT /api.confirm/<br>
+- Oblíbené kapely draft: POST /api.fan/publicid/favorite-band-list/, DELETE /api.fan/publicid/favorite-band-list/<br>
+- Friends draft: POST /api.fan/publicid/friend-list/, DELETE /api.fan/publicid/friend-list/<br>
+- Gig attendee list draft: GET /api.gig/id/attendee-list/<br>
+- Gig attendance draft: POST /api.gig/id/attendee-list/, DELETE /api.gig/id/attendee-list/<br>
+
+2012-11-21<br>
+- všecha URLs v API končí lomítkem (konzistence, použitý FW to někde vynucuje - je možné, že se tohle ještě změní)<br>
+- session vrací user-token, kterým se pak identifikuje uživatel v headeru pomocí User-Token<br>
+- docs.bz.apiary.io je nyní updatnut tak, že u každého URL je Status:, který značí, v jakém je stavu<br>
+
+---
+
+--
+User / Fan
+--
+Vypise data uzivatele publicid<br>
+Access: R<br>
+Status: online
+GET /api.fan/publicid/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "id": 13190,
+    "type": "fan",
+    "url": "/api.fan/publicid/", // API URL
+    "webUrl": "http://bandzone.cz/fan/publicid",    // web URL
+    "name": "User Name",    // jmeno = nick
+    "gender": "M",  // M, F, NULL
+    "age": 29,    // or NULL
+    "city": "Praha",    // or NULL
+    "image": {
+        "small": {  // ctvercovy vyrez 58x58px
+            "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/goqoA11r0iIH29LnA_dBQg6ohtIULMYt.jpg"
+        },
+        "profile": {    // format 250x<y>px
+            "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/K6Yr0dio1PfeoFi7bsn4IyQ1cBiz8Y3o.jpg"
+        },
+        "full": {   // plna velikost
+            "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/X8Gms_QpMd2vlNu6IzieYac-IDkBaUha.jpg"
+        }
+    },
+    "favoriteBandList": {   // list 5 polozek automaticky
+        "url": "/api.fan/publicid/favorite-band-list/",
+        "total": 86,
+        "items": [
+            {
+                "id": 1040,
+                "type": "band",
+                "url": "/api.band/kombucha/",
+                "webUrl": "http://bandzone.cz/kombucha",
+                "name": "Kombucha",
+                "genre": "aggro-psychedelic",
+                "city": "Praha",
+                "image": {
+                    "small": {
+                        "url": "http://usr.bandzone.cz/band/ko/kombucha/gallery/profile.default/384269_t_s.jpg"
+                    }
+                }
+            },
+            {
+                "id": 2196,
+                "type": "band",
+                "url": "/api.band/ahumadogranujo/",
+                "webUrl": "http://bandzone.cz/ahumadogranujo",
+                "name": "Ahumado Granujo",
+                "genre": "grind-dance music",
+                "city": "Praha",
+                "image": {
+                    "small": {
+                        "url": "http://usr.bandzone.cz/band/ah/ahumadogranujo/gallery/profile.default/x4n0jvF8qnazQiI1L8Nv4BNG-7HOc2fL.jpg"
+                    }
+                }
+            }
+        ]
+    },
+    "friendList": {
+        "url": "/api.fan/publicid/friend-list/",
+        "total": 54,
+        "items": [
+            {
+                "id": 13290,
+                "type": "fan",
+                "url": "/api.fan/trta/",
+                "webUrl": "http://bandzone.cz/fan/trta",
+                "name": "ʕ •ᴥ•ʔ křupavoučká jitrnice",
+                "gender": "F",
+                "age": 30,
+                "city": "Nýmand berk",
+                "mutual": TRUE, // mutual friendship?
+                "image": {
+                    "small": {
+                        "url": "http://usr.bandzone.cz/fan/tr/trta/gallery/profile.default/GfCcQir0ZKMjkjZhN1vGvSxXaaym0P8H.jpg"
+                    }
+                }
+            },
+            {
+                "id": 13189,
+                "type": "fan",
+                "url": "/api.fan/majklac/",
+                "webUrl": "http://bandzone.cz/fan/majklac",
+                "name": "Majkláč",
+                "gender": "M",
+                "age": 33,
+                "city": "Praha",
+                "mutual": FALSE, // mutual friendship?
+                "image": {
+                    "small": {
+                        "url": "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/dT9BOUxUeJ9mBLLT3G-0mLE3fX6KWyyf.jpg"
+                    }
+                }
+            }
+        ]
+    }
+}
+
+Seznam oblibenych kapel uzivatele publicid<br>
+Access: R<br>
+Status: online
+GET /api.fan/publicid/favorite-band-list/?page=1
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "url": "/api.fan/publicid/favorite-band-list/",
+    "total": 86,
+    "totalPages": 9,
+    "page": 1,
+    "pageSize": 10,
+    "items": [
+        {
+            "id": 1040,
+            "type": "band",
+            "url": "/api.band/kombucha/",
+            "webUrl": "http://bandzone.cz/kombucha",
+            "name": "Kombucha",
+            "genre": "aggro-psychedelic",
+            "city": "Praha",
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/band/ko/kombucha/gallery/profile.default/384269_t_s.jpg"
+                },
+                "profile": {
+                    "url": "http://usr.bandzone.cz/band/ko/kombucha/gallery/profile.default/384269_p.jpg"
+                },
+                "full": {
+                    "url": "http://usr.bandzone.cz/band/ko/kombucha/gallery/profile.default/384269.jpg"
+                }
+            }
+        },
+        {
+            "id": 2196,
+            "type": "band",
+            "url": "/api.band/ahumadogranujo/",
+            "webUrl": "http://bandzone.cz/ahumadogranujo",
+            "name": "Ahumado Granujo",
+            "genre": "grind-dance music",
+            "city": "Praha",
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/band/ah/ahumadogranujo/gallery/profile.default/x4n0jvF8qnazQiI1L8Nv4BNG-7HOc2fL.jpg"
+                },
+                "profile": {
+                    "url": "http://usr.bandzone.cz/band/ah/ahumadogranujo/gallery/profile.default/qqABhd0S7cE9xPX3R8U1Z3TUxbXQQfyo.jpg"
+                },
+                "full": {
+                    "url": "http://usr.bandzone.cz/band/ah/ahumadogranujo/gallery/profile.default/huUxcL-YbsoBLofbjRATJRBpJM3xL06V.jpg"
+                }
+            }
+        },
+        // repeat
+    ]
+}
+
+Pridani kapely do oblibenych - prida kapelu s "id" do oblibenych kapel fanouska publicid (fanousek publicid zalajkuje kapelu s "id")<br>
+Access: S<br>
+Status: draft
+POST /api.fan/publicid/favorite-band-list/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> User-Token: 5cc3944e93fdf326886c8a225d59aa2e460954fc
+> Content-Type: application/json
+{
+    "id": 7827  // id kapely, kterou chceme pridat na seznam oblibenych kapel fanouska publicid
+}
+< 201
+< Content-Type: application/json
+{
+    "id": 7827,
+    "type": "band",
+    "url": "/api.band/hawat/",
+    "webUrl": "http://bandzone.cz/hawat",
+    "name": "Hawat",
+    "genre": "alternative-metal",
+    "city": "Poděbrady",
+    "image": {
+        "small": {
+            "url": "http://usr.bandzone.cz/band/ha/hawat/gallery/profile.default/347512_t_s.jpg"
+        }
+    }
+}
+
+Odebrani kapely z oblibenych - odebere kapelu s "id" z oblibenych kapel fanouska publicid<br>
+Access: S<br>
+Status: draft
+DELETE /api.fan/publicid/favorite-band-list/7827/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> User-Token: 5cc3944e93fdf326886c8a225d59aa2e460954fc
+< 200
+< Content-Type: application/json
+{
+    // empty response
+}
+
+Seznam pratel uzivatele publicid<br>
+Access: R<br>
+Status: online krome mutual friendship
+GET /api.fan/publicid/friend-list/?page=2
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "url": "/api.fan/publicid/friend-list/",
+    "total": 54,
+    "totalPages": 6,
+    "page": 2,
+    "pageSize": 10,
+    "items": [
+        {
+            "id": 13290,
+            "type": "fan",
+            "url": "/api.fan/trta/",
+            "webUrl": "http://bandzone.cz/fan/trta",
+            "name": "ʕ •ᴥ•ʔ křupavoučká jitrnice",
+            "gender": "F",
+            "age": 30,
+            "city": "Nýmand berk",
+            "mutual": TRUE,     // mutual friendship?
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/fan/tr/trta/gallery/profile.default/GfCcQir0ZKMjkjZhN1vGvSxXaaym0P8H.jpg"
+                },
+                "profile": {
+                    "url": "http://usr.bandzone.cz/fan/tr/trta/gallery/profile.default/wCpsUy_CnTD8z68o3oXlwyI9XKoKOIVl.jpg"
+                },
+                "full": {
+                    "url": "http://usr.bandzone.cz/fan/tr/trta/gallery/profile.default/Not3GryogCJI0qWVDMDo_rc6soPwaCpg.jpg"
+                }
+            }
+        },
+        {
+            "id": 13189,
+            "type": "fan"
+            "url": "/api.fan/majklac/",
+            "webUrl": "http://bandzone.cz/fan/majklac",
+            "name": "Majkláč",
+            "gender": "M",
+            "age": 33,
+            "city": "Praha",
+            "mutual": FALSE,    // mutual friendship?
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/dT9BOUxUeJ9mBLLT3G-0mLE3fX6KWyyf.jpg"
+                },
+                "profile": {
+                    "url": "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/He1HyrwrpTjYjKfSPoz6l66dkif7W3UD.jpg"
+                },
+                "full": {
+                    "url" : "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/Y50pz4zZnn0SS0NMfgnX4w05xO7oGq5V.jpg"
+                }
+            }
+        }
+        // repeat
+    ]
+}
+
+Pridani fanouska do pratel - prida fanouska s "id" do pratel fanouska publicid<br>
+Access: S<br>
+Status: draft
+POST /api.fan/publicid/friend-list/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> User-Token: 5cc3944e93fdf326886c8a225d59aa2e460954fc
+> Content-Type: application/json
+{
+    "id": 13290  // id fanouiska, ktereho chceme pridat do friend-listu fanouska publicid
+}
+< 201
+< Content-Type: application/json
+{
+    "id": 13290,
+    "type": "fan",
+    "url": "/api.fan/trta/",
+    "webUrl": "http://bandzone.cz/fan/trta",
+    "name": "ʕ •ᴥ•ʔ křupavoučká jitrnice",
+    "gender": "F",
+    "age": 30,
+    "city": "Nýmand berk",
+    "mutual": TRUE,     // mutual friendship?
+    "image": {
+        "small": {
+            "url": "http://usr.bandzone.cz/fan/tr/trta/gallery/profile.default/GfCcQir0ZKMjkjZhN1vGvSxXaaym0P8H.jpg"
+        }
+    }
+}
+
+Odebrani fanouska z pratel - odebere fanouska s "id" z pratel fanouska publicid<br>
+Access: S<br>
+Status: draft
+DELETE /api.fan/publicid/favorite-band-list/13290/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> User-Token: 5cc3944e93fdf326886c8a225d59aa2e460954fc
+< 200
+< Content-Type: application/json
+{
+    // empty response
+}
+
+Výpis fanoušků = uživatelů<br>
+Access: R<br>
+Status: online, filtrování jen fulltext parametr q
+GET /api.fan-list/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "url": "/api.fan-list/",
+    "total": 54,
+    "totalPages": 6,
+    "page": 1,
+    "pageSize": 10,
+    "filters": {    // NIY
+        "q": NULL,  // fulltext query
+        "ageMin": NULL,
+        "ageMax": NULL,
+        "gender": NULL,  // "M", "F", NULL
+        "lat": NULL,    // not currently supported
+        "long": NULL,
+        "radius": NULL, // 2km, 500m etc.
+    },
+    "items": [
+        {
+            "id": 220842,
+            "type": "fan",
+            "url": "/api.fan/mikakoffin/",
+            "webUrl": "http://bandzone.cz/fan/mikakoffin",
+            "name": "Mika Koffin",
+            "gender": NULL,
+            "age": 34,
+            "city": "Brno",
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/fan/mi/mikakoffin/gallery/profile.default/612800_t_s.jpg"
+                }
+            }
+        },
+        {
+            "id": 13222,
+            "type": "fan",
+            "url": "/api.fan/pepek/",
+            "webUrl": "http://bandzone.cz/fan/pepek",
+            "name": "pepek the new better person",
+            "gender": "F",
+            "age": 26,
+            "city": "Praha",
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/fan/pe/pepek/gallery/profile.default/u5sfSs-Avz_baAToNcirCf28oDPp_LQi.jpg"
+                }
+            }
+        },
+        // repeat
+    ]
+}
+
+--
+Band / Kapela
+--
+Vypise data kapely publicid<br>
+Access: R<br>
+Status: online kromě trackList
+GET /api.band/publicid/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "id": 1040,
+    "type": "band",
+    "url": "/api.band/publicid/",
+    "webUrl": "http://bandzone.cz/publicid",
+    "name": "Kombucha",
+    "genre": "aggro-psychedelic",
+    "city": "Praha",
+    "image": {
+        "small": {
+            "url": "http://usr.bandzone.cz/band/ko/kombucha/gallery/profile.default/384269_t_s.jpg"
+        },
+        "profile": {
+            "url": "http://usr.bandzone.cz/band/ko/kombucha/gallery/profile.default/384269_p.jpg"
+        },
+        "full": {
+            "url": "http://usr.bandzone.cz/band/ko/kombucha/gallery/profile.default/384269.jpg"
+        }
+    },
+    "trackList": {
+        "url": "/api.band/publicid/track-list/",
+        "total": 15,
+        "items": [ // A preview of few items
+            {
+                "id": 68055,
+                "type": "track",
+                "url": "/api.track/45324/",
+                "playUrl": "/api.track/45324/play/", // URL for audio playing - TODO
+                "name": "Papiňák s benzínem",
+                "plays": 1203
+            },
+            {
+                "id": 68072,
+                "type": "track",
+                "url": "/api.track/53641/",
+                "playUrl": "/api.track/53641/play/", // URL for audio playing - TODO
+                "name": "Babička Věra",
+                "plays": 1431
+            }
+        ]
+    },
+    "albumList": {
+        "url": "/api.band/publicid/album-list/",
+        "total": 2,
+        "items": [ // A preview of few items
+            {
+                "id": 53302,
+                "type": "album",
+                "url": "/api.band/publicid/album/56561/",
+                "name": "Na dosah - part III.",
+                "image": {
+                    "small": {
+                        "url": "http://usr.bandzone.cz/band/th/theswitch/18/66/4a95/kwOl-wrqrEAeFYFOf7F20SnG3YGQOunZ.jpg"
+                    }
+                },
+                "tracks": 5,
+                "type": "cd",   // "cd", "dvd", "vynil", "digital", "mc", "other"
+                "released": "2010"  // year or full date YYYY-MM-DD
+            },
+            {
+                "id": 53315,
+                "type": "album",
+                "url": "/api.band/publicid/album/58559/",
+                "name": "OFF",
+                "image": {
+                    "small": {
+                        "url": "http://usr.bandzone.cz/band/th/theswitch/03/9e/23e1/PpVeEXiEVrfvH8U7rWcoAofYuydwkqG_.jpg"
+                    }
+                },
+                "tracks": 12,
+                "type": "cd",
+                "released": "2012-03-21"
+            }
+        ]
+    },
+    "fanList": {
+        "url": "/api.band/publicid/fan-list/",
+        "total": 531,
+        "items": [  // A preview of few items, only small image urls
+            {
+                "id": 220842,
+                "type": "fan",
+                "url": "/api.fan/mikakoffin",
+                "webUrl": "http://bandzone.cz/fan/mikakoffin",
+                "name": "Mika Koffin",
+                "gender": NULL,
+                "age": 34,
+                "city": "Brno",
+                "image": {
+                    "small": {
+                        "url": "http://usr.bandzone.cz/fan/mi/mikakoffin/gallery/profile.default/612800_t_s.jpg"
+                    }
+                }
+            },
+            {
+                "id": 13222,
+                "type": "fan",
+                "url": "/api.fan/pepek/",
+                "webUrl": "http://bandzone.cz/fan/pepek",
+                "name": "pepek the new better person",
+                "gender": "F",
+                "age": 26,
+                "city": "Praha",
+                "image": {
+                    "small": {
+                        "url": "http://usr.bandzone.cz/fan/pe/pepek/gallery/profile.default/u5sfSs-Avz_baAToNcirCf28oDPp_LQi.jpg"
+                    }
+                }
+            }
+        ]
+    }
+}
+
+Seznam tracku kapely publicid<br>
+Access: R<br>
+Status: online, TODO track playing
+GET /api.band/publicid/track-list/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "url": "/api.band/publicid/track-list/",
+    "total": 15,
+    "totalPages": 1,
+    "page": 0,
+    "pageSize": 10,
+    "items": [
+        {
+            "id": 68055,
+            "type": "track",
+            "url": "/api.track/45324/",
+            "playUrl": "/api.track/45324/play/", // URL for audio playing - TODO
+            "name": "Papiňák s benzínem",
+            "plays": 1203
+        },
+        {
+            "id": 68072,
+            "type": "track",
+            "url": "/api.track/53641/",
+            "playUrl": "/api.track/53641/play/", // URL for audio playing - TODO
+            "name": "Babička Věra",
+            "plays": 1431
+        },
+        // repeat
+    ]
+}
+
+Seznam alb kapely publicid<br>
+Access: R<br>
+Status: online
+GET /api.band/publicid/album-list/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "url": "/api.band/publicid/album-list/",
+    "total": 2,
+    "totalPages": 1,
+    "page": 0,
+    "pageSize": 10,
+    "items": [
+        {
+            "id": 53302,
+            "type": "album",
+            "url": "/api.band/publicid/album/56561/",
+            "name": "Na dosah - part III.",
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/band/th/theswitch/18/66/4a95/kwOl-wrqrEAeFYFOf7F20SnG3YGQOunZ.jpg"
+                },
+                "full": {
+                    "url": "http://usr.bandzone.cz/band/th/theswitch/18/66/4a95/JG7XSSKyJyPvy2jmkPVsIf4BbOGF9E_E.jpg"
+                }
+            },
+            "tracks": 5,
+            "type": "cd",   // "cd", "dvd", "vynil", "digital", "mc", "other"
+            "released": "2010",  // year or full date YYYY-MM-DD
+            //TODO: additional info, producent atd.
+        },
+        {
+            "id": 53315,
+            "type": "album",
+            "url": "/api.band/publicid/album/58559/",
+            "name": "OFF",
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/band/th/theswitch/03/9e/23e1/PpVeEXiEVrfvH8U7rWcoAofYuydwkqG_.jpg"
+                },
+                "full": {
+                    "url": "http://usr.bandzone.cz/band/th/theswitch/03/9e/23e1/cplLSmEqwnxrt5NJ8QsscEt-TVRi0Q2p.jpg"
+                }
+            },
+            "tracks": 12,
+            "type": "cd",
+            "released": "2012-03-21",
+            //TODO: additional info
+        }
+    ]
+}
+
+Detail alba<br>
+Access: R<br>
+Status: online
+GET /api.band/publicid/album/56561/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "id": 53315,
+    "type": "album",
+    "url": "/api.band/publicid/album/58559/",
+    "name": "OFF",
+    "image": {
+        "small": {
+            "url": "http://usr.bandzone.cz/band/th/theswitch/03/9e/23e1/PpVeEXiEVrfvH8U7rWcoAofYuydwkqG_.jpg"
+        },
+        "full": {
+            "url": "http://usr.bandzone.cz/band/th/theswitch/03/9e/23e1/cplLSmEqwnxrt5NJ8QsscEt-TVRi0Q2p.jpg"
+        }
+    },
+    "tracks": 12,
+    "type": "cd",
+    "released": "2012-03-21",
+    //TODO: additional info
+}
+
+Seznam fanousku kapely publicid<br>
+Access: R<br>
+Status: online
+GET /api.band/publicid/fan-list/?page=33
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "url": "/api.band/publicid/fan-list/",
+    "total": 531,
+    "totalPages": 54,
+    "page": 33,
+    "pageSize": 10,
+    "items": [
+        {
+            "id": 220842,
+            "type": "fan",
+            "url": "/api.fan/mikakoffin/",
+            "webUrl": "http://bandzone.cz/fan/mikakoffin",
+            "name": "Mika Koffin",
+            "gender": NULL,
+            "age": 34,
+            "city": "Brno",
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/fan/mi/mikakoffin/gallery/profile.default/612800_t_s.jpg"
+                },
+                "profile": {
+                    "url": "http://usr.bandzone.cz/fan/mi/mikakoffin/gallery/profile.default/612800_p.jpg"
+                },
+                "full": {
+                    "url": "http://usr.bandzone.cz/fan/mi/mikakoffin/gallery/profile.default/612800.jpg"
+                }
+            }
+        },
+        {
+            "id": 13222,
+            "type": "fan",
+            "url": "/api.fan/pepek/",
+            "webUrl": "http://bandzone.cz/fan/pepek",
+            "name": "pepek the new better person",
+            "gender": "F",
+            "age": 26,
+            "city": "Praha",
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/fan/pe/pepek/gallery/profile.default/u5sfSs-Avz_baAToNcirCf28oDPp_LQi.jpg"
+                },
+                "profile": {
+                    "url": "http://usr.bandzone.cz/fan/pe/pepek/gallery/profile.default/51Y2hbEDMPHbf0RZ36tC7UBRC3BoJSvs.jpg"
+                },
+                "full": {
+                    "url": "http://usr.bandzone.cz/fan/pe/pepek/gallery/profile.default/UCq_793GBBgnNH1TWWBbKalXoQ9xLwL9.jpg"
+                }
+            }
+        }
+        // repeat
+    ]
+}
+
+Výpis kapel<br>
+Access: R<br>
+Status: online, filtrování jen fulltext parametr q
+GET /api.band-list/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "url": "/api.band-list/",
+    "total": 3564,
+    "totalPages": 357,
+    "page": 1,
+    "pageSize": 10,
+    "filters": {
+        "q": NULL,  // fulltext query
+    },
+    "items": [
+        {
+            "id": 104,
+            "type": "band",
+            "url": "/api.band/insania/",
+            "webUrl": "http://bandzone.cz/insania",
+            "name": "Insania",
+            "genre": "post hardcore-metal",
+            "city": "Brno",
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/band/in/insania/gallery/profile.default/V2sJ_D8m0ujWqb11mhbFiR0c1LzbXZR5.jpg"
+                }
+            }
+        },
+        {
+            "id": 622,
+            "type": "band",
+            "url": "/api.band/nasrot/",
+            "webUrl": "http://bandzone.cz/nasrot",
+            "name": "Našrot",
+            "genre": "hardcore-crossover",
+            "city": "Havlíčkův Brod",
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/band/na/nasrot/gallery/profile.default/B3XMhWX6LDsejGGGfNU34uMi0tO1low0.jpg"
+                }
+            }
+        },
+        // repeat
+    ]
+}
+
+-- Tracky --
+Vypise detaily tracku<br>
+Access: R<br>
+Status: online, TODO track play
+GET /api.track/45324/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "id": 68055,
+    "type": "track",
+    "url": "/api.track/45324/",
+    "name": "Papiňák s benzínem",
+    "playUrl": "/api.track/45324/play/",    // TODO
+    "plays": 1203
+    // TODO: additional info
+}
+
+Prehrani tracku<br>
+Access: W<br>
+Status: TODO
+GET /api.track/45324/play/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> Session-Id: 03487c7b2673a260f68537d65f5b9d0e64864302
+< 200
+< Content-Type: application/json
+{
+    // TODO: vymyslet, jak bude fungovat - melo by tu byt URL pro zapocitani prehrani apod.
+}
+
+-- Gig / Akce --
+Vypise data akce id<br>
+Access: R<br>
+Status: online kromě attendeeList
+GET /api.gig/id/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "id": 2133493,
+    "type": "gig",
+    "url": "/api.gig/id/",
+    "webUrl": "http://bandzone.cz/akce/id",
+    "name": "25 LET REVOLTY",
+    "startDate": "2012-10-06",
+    "startTime": "20:00:00",
+    "endDate": NULL,
+    "endTime": NULL,
+    "entry": "190 Kč na místě",
+    "entryType": "C",    // C = custom (paid?), F = free, V = voluntary
+    "city": "Brno",
+    "venue": {
+        "id": 588685,
+        "type": "venue",
+        "url": "/api.venue/id/", // optional, if not provideded = no venue info
+        "name": "Fléda",
+        // only if URL provided
+        "street1": "Štefánikova 24",
+        "street2": "",
+        "city": "Brno",
+        "zip": "60200",
+        "lat": 49.2100761,  // missing in data now
+        "long": 16.6032350,
+        "externalUrl": "http://fleda.cz/"
+    },
+    "info": "Astrální hardcoreoví bojovníci kmene Insania v čele s náčelníkem Polym oslaví 25 let své divoké existence. Jedním z gratulantů bude i legendární Našrot.\nTento večer skalpel provede živý řez čtvrtstoletím. Zazní něco ze starších nevergreenů a na prknech, co znamenají podsvětí, se zjeví bývalí členové. Korunu celému večeru nasadí masová spiritistická seance, při níž bude vyvolána historická, zakládající sestava INSANIE z roku 987, která zahraje \"hudbu\" z téhle doby. Povinná účast pro milovníky obskurních temných událostí, které už se nebudou nikdy opakovat. Leda snad za dalších 25 let?",
+    "attendeeList": {   // preview of few items
+        "url": "/api.gig/id/attendee-list/",
+        "total": 66,
+        "items": [
+            {
+                "id": 220842,
+                "type": "fan",
+                "url": "/api.fan/mikakoffin",
+                "webUrl": "http://bandzone.cz/fan/mikakoffin",
+                "name": "Mika Koffin",
+                "gender": NULL,
+                "age": 34,
+                "city": "Brno",
+                "image": {
+                    "small": {
+                        "url": "http://usr.bandzone.cz/fan/mi/mikakoffin/gallery/profile.default/612800_t_s.jpg"
+                    }
+                }
+            },
+            {
+                "id": 13222,
+                "type": "fan",
+                "url": "/api.fan/pepek/",
+                "webUrl": "http://bandzone.cz/fan/pepek",
+                "name": "pepek the new better person",
+                "gender": "F",
+                "age": 26,
+                "city": "Praha",
+                "image": {
+                    "small": {
+                        "url": "http://usr.bandzone.cz/fan/pe/pepek/gallery/profile.default/u5sfSs-Avz_baAToNcirCf28oDPp_LQi.jpg"
+                    }
+                }
+            }
+        ]
+    },
+    "bandList": {
+        "url": "/api.gig/id/band-list",
+        "total": 2,
+        "items": [
+            {
+                "id": 104,
+                "type": "band",
+                "url": "/api.band/insania/",
+                "webUrl": "http://bandzone.cz/insania",
+                "name": "Insania",
+                "genre": "post hardcore-metal",
+                "city": "Brno",
+                "image": {
+                    "small": {
+                        "url": "http://usr.bandzone.cz/band/in/insania/gallery/profile.default/V2sJ_D8m0ujWqb11mhbFiR0c1LzbXZR5.jpg"
+                    }
+                }
+            },
+            {
+                "id": 622,
+                "type": "band",
+                "url": "/api.band/nasrot/",
+                "webUrl": "http://bandzone.cz/nasrot",
+                "name": "Našrot",
+                "genre": "hardcore-crossover",
+                "city": "Havlíčkův Brod",
+                "image": {
+                    "small": {
+                        "url": "http://usr.bandzone.cz/band/na/nasrot/gallery/profile.default/B3XMhWX6LDsejGGGfNU34uMi0tO1low0.jpg"
+                    }
+                }
+            }
+        ]
+    }
+}
+
+Vypise kapely ucastnici se akce id<br>
+Access: R<br>
+Status: online
+GET /api.gig/id/band-list/?page=1
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "url": "/api.gig/id/band-list/",
+    "total": 2,
+    "totalPages": 1,
+    "page": 1,
+    "pageSize": 10,
+    "items": [
+        {
+            "id": 104,
+            "type": "band",
+            "url": "/api.band/insania/",
+            "webUrl": "http://bandzone.cz/insania",
+            "name": "Insania",
+            "genre": "post hardcore-metal",
+            "city": "Brno",
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/band/in/insania/gallery/profile.default/V2sJ_D8m0ujWqb11mhbFiR0c1LzbXZR5.jpg"
+                }
+            }
+        },
+        {
+            "id": 622,
+            "type": "band",
+            "url": "/api.band/nasrot/",
+            "webUrl": "http://bandzone.cz/nasrot",
+            "name": "Našrot",
+            "genre": "hardcore-crossover",
+            "city": "Havlíčkův Brod",
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/band/na/nasrot/gallery/profile.default/B3XMhWX6LDsejGGGfNU34uMi0tO1low0.jpg"
+                }
+            }
+        }
+    ]
+}
+
+Vypise fanousky chystajici se na akci id<br>
+Access: R<br>
+Status: draft
+GET /api.gig/id/attendee-list/?page=1
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "url": "/api.gig/id/attendee-list/",
+    "total": 66,
+    "totalPages": 7,
+    "page": 1,
+    "pageSize": 10,
+    "items": [
+        {
+            "id": 220842,
+            "type": "fan",
+            "url": "/api.fan/mikakoffin",
+            "webUrl": "http://bandzone.cz/fan/mikakoffin",
+            "name": "Mika Koffin",
+            "gender": NULL,
+            "age": 34,
+            "city": "Brno",
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/fan/mi/mikakoffin/gallery/profile.default/612800_t_s.jpg"
+                }
+            }
+        },
+        {
+            "id": 13222,
+            "type": "fan",
+            "url": "/api.fan/pepek/",
+            "webUrl": "http://bandzone.cz/fan/pepek",
+            "name": "pepek the new better person",
+            "gender": "F",
+            "age": 26,
+            "city": "Praha",
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/fan/pe/pepek/gallery/profile.default/u5sfSs-Avz_baAToNcirCf28oDPp_LQi.jpg"
+                }
+            }
+        }
+    ]
+}
+
+Pridani fanouska na attendee-list akce
+Access: S<br>
+Status: draft+TODO
+POST /api.gig/id/attendee-list/?page=1
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> User-Token: 5cc3944e93fdf326886c8a225d59aa2e460954fc
+> Content-Type: application/json
+{
+    "id": 13222,  // id fanouska, ktereho chceme pridat na attendee-list (musi se shodovat s prihlasenym)
+    "type": "C"     // "C" = pridat do kalendare (neverejny attending), "A" nebo not set = jdu (verejny attending)
+}
+< 201
+< Content-Type: application/json
+{
+    //TODO
+}
+
+Smazani fanouska z attendee-listu akce
+Access: S<br>
+Status: draft+TODO
+DELETE /api.gig/id/attendee-list/13222/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> User-Token: 5cc3944e93fdf326886c8a225d59aa2e460954fc
+< 200
+< Content-Type: application/json
+{
+    // empty response
+}
+
+Výpis / hledání akcí<br>
+Access: R<br>
+Status: online, filtrování fulltext parametr q + startDate + endDate, attendeeList draft<br>
+Filtry:<br>
+q: fulltext query<br>
+startDate: pocatecni datum koncertu (YYYY-MM-DD), default (NULL, nezadano) je NOW<br>
+endDate: konecne datum koncertu (YYYY-MM-DD), defualt (NULL, nezadano) je no limit
+GET /api.gig-list/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "url": "/api.gig-list/",
+    "total": 3994,
+    "totalPages": 400,
+    "page": 0,
+    "pageSize": 10,
+    "filters": {    // NIY
+        "q": NULL,  // fulltext query
+        "startDate": NULL,  // YYYY-MM-DD
+        "endDate": NULL,    // YYYY-MM-DD
+        "lat": NULL,    // not currently supported
+        "long": NULL,
+        "radius": NULL, // 2km, 500m etc.
+    },
+    "items": [
+        {
+            "id": 2133493,
+            "type": "gig",
+            "url": "/api.gig/id/",
+            "webUrl": "http://bandzone.cz/akce/id",
+            "name": "25 LET REVOLTY",
+            "startDate": "2012-10-06",
+            "startTime": "20:00:00",
+            "endDate": NULL,
+            "endTime": NULL,
+            "entry": "190 Kč na místě",
+            "entryType": "C",    // C = custom (paid?), F = free, V = voluntary
+            "city": "Brno",
+            "venue": {
+                "id": 588685,
+                "type": "venue",
+                "url": "/api.venue/id/", // optional, if not provideded = no venue info
+                "name": "Fléda",
+                // only if URL provided
+                "street1": "Štefánikova 24",
+                "street2": "",
+                "city": "Brno",
+                "zip": "60200",
+                "lat": 49.2100761,  // missing in data now
+                "long": 16.6032350,
+                "externalUrl": "http://fleda.cz/"
+            },
+            "attendeeList": {   // preview of few items
+                "url": "/api.gig/id/attendee-list",
+                "total": 66,
+                "items": [
+                    {
+                        "id": 220842,
+                        "type": "fan",
+                        "url": "/api.fan/mikakoffin",
+                        "webUrl": "http://bandzone.cz/fan/mikakoffin",
+                        "name": "Mika Koffin",
+                        "gender": NULL,
+                        "age": 34,
+                        "city": "Brno",
+                        "image": {
+                            "small": {
+                                "url": "http://usr.bandzone.cz/fan/mi/mikakoffin/gallery/profile.default/612800_t_s.jpg"
+                            }
+                        }
+                    },
+                    {
+                        "id": 13222,
+                        "type": "fan",
+                        "url": "/api.fan/pepek/",
+                        "webUrl": "http://bandzone.cz/fan/pepek",
+                        "name": "pepek the new better person",
+                        "gender": "F",
+                        "age": 26,
+                        "city": "Praha",
+                        "image": {
+                            "small": {
+                                "url": "http://usr.bandzone.cz/fan/pe/pepek/gallery/profile.default/u5sfSs-Avz_baAToNcirCf28oDPp_LQi.jpg"
+                            }
+                        }
+                    }
+                ]
+            },
+            "bandList": {
+                "url": "/api.gig/id/band-list/",
+                "total": 2,
+                "items": [
+                    {
+                        "id": 104,
+                        "type": "band",
+                        "url": "/api.band/insania",
+                        "webUrl": "http://bandzone.cz/insania/",
+                        "name": "Insania",
+                        "genre": "post hardcore-metal",
+                        "city": "Brno",
+                        "image": {
+                            "small": {
+                                "url": "http://usr.bandzone.cz/band/in/insania/gallery/profile.default/V2sJ_D8m0ujWqb11mhbFiR0c1LzbXZR5.jpg"
+                            }
+                        }
+                    },
+                    {
+                        "id": 622,
+                        "type": "band",
+                        "url": "/api.band/nasrot/",
+                        "webUrl": "http://bandzone.cz/nasrot",
+                        "name": "Našrot",
+                        "genre": "hardcore-crossover",
+                        "city": "Havlíčkův Brod",
+                        "image": {
+                            "small": {
+                                "url": "http://usr.bandzone.cz/band/na/nasrot/gallery/profile.default/B3XMhWX6LDsejGGGfNU34uMi0tO1low0.jpg"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        // repeat
+    ]
+}
+
+--
+Venues / Kluby
+--
+
+Detail klubu<br>
+Access: R<br>
+Status: online
+GET /api.venue/id/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "id": 588685,
+    "type": "venue",
+    "url": "/api.venue/id/", // optional, if not provideded = no venue info
+    "webUrl": "",   // NIY
+    "name": "Fléda",
+    // optional if URL provided
+    "street1": "Štefánikova 24",
+    "street2": "",
+    "city": "Brno",
+    "zip": "60200",
+    "lat": 49.2100761,  // missing in data
+    "long": 16.6032350,
+    "externalUrl": "http://fleda.cz/"
+}
+
+Vypis klubu<br>
+Access: R<br>
+Status: online, filtrování jen fulltext parametr q
+GET /api.venue-list/?q=fleda
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "url": "/api.venue-list/",
+    "total": 1,
+    "totalPages": 1,
+    "page": 1,
+    "pageSize": 10,
+    "filters": {    // NIY
+        "q": "fleda",  // fulltext query
+        "lat": NULL,    // not currently supported
+        "long": NULL,
+        "radius": NULL, // 2km, 500m etc.
+    },
+    "items": [
+        {
+            "id": 588685,
+            "type": "venue",
+            "url": "/api.venue/id/",
+            "webUrl": "",   // NIY
+            "name": "Fléda",
+            // optional info if known and set
+            "street1": "Štefánikova 24",
+            "street2": "",
+            "city": "Brno",
+            "zip": "60200",
+            "lat": 49.2100761,  // missing in data
+            "long": 16.6032350,
+            "externalUrl": "http://fleda.cz/"
+        },
+        // repeat
+    ]
+}
+
+--
+Session / Přihlášení / Odhlášení atd.
+--
+
+Přihlášení uživatele, získání user tokenu<br>
+201 v případě správne kombinace loginu a hesla<br>
+Za login a password nutno doplnit platný login<br>
+Access: W<br>
+Status: online
+POST /api.session/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> Content-Type: application/x-www-form-urlencoded
+login={username}&password={hesloneasi}
+< 201
+< Content-Type: application/json
+{
+    "url": "/api.session/03487c7b2673a260f68537d65f5b9d0e64864302/", // tady lze ziskat informace o session
+    "user-token": "03487c7b2673a260f68537d65f5b9d0e64864302",
+    "user": {
+        "id": 666,
+        "type": "fan",
+        "url": "/api.fan/publicid", // API URL
+        "name": "Franta Vomáčka",   // nick
+        "webUrl": "http://bandzone.cz/fan/publicid",
+        "gender": "M",  // M, F, NULL
+        "age": 29,    // or NULL
+        "city": "Praha",    // or NULL
+        "image": {
+            "small": {
+                "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/goqoA11r0iIH29LnA_dBQg6ohtIULMYt.jpg"
+            }
+        }
+    }
+}
+
+Získání informací o přihlášeném uživateli<br>
+Access: S<br>
+Status: online
+GET /api.session/03487c7b2673a260f68537d65f5b9d0e64864302/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "id": 666,
+    "type": "fan",
+    "url": "/api.fan/publicid", // API URL
+    "name": "Franta Vomáčka",   // nick
+    "webUrl": "http://bandzone.cz/fan/publicid",
+    "gender": "M",  // M, F, NULL
+    "age": 29,    // or NULL
+    "city": "Praha",    // or NULL
+    "image": {
+        "small": {
+            "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/goqoA11r0iIH29LnA_dBQg6ohtIULMYt.jpg"
+        }
+    }
+}
+
+Odhlášení uživatele<br>
+Access: S<br>
+Status: online
+DELETE /api.session/03487c7b2673a260f68537d65f5b9d0e64864302/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    // empty response
+}
+
+--
+Registrace uživatele
+--
+
+Vytvoření účtu<br>
+Access: W<br>
+Status: draft+TODO
+POST /api.register/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> Content-Type: application/json
+{
+    "login": "username",    // uzivatelske jmeno, musi byt unikatni
+    "password": "heslo",    // heslo, alespoň 5 znaků
+    "email": "platny@email.tld",    // platný e-mail, na jednu adresu může být u nás jen jeden účet
+    "name": "Franta Vomáčka", // jméno, pod kterým se bude user zobrazovat
+    "confirmLinkMask": "http://server.nekde/potvrdit.html?{code}",   // maska potvrzovacího odkazu, který bude zaslán na zadaný mail, {code} bude nahrazeno kódem, kterým je nutno potvrdit e-mailovou adresu
+    //TODO: je to pro vas takhle OK? Druha moznost je poslat link k nam na web a objednat si tady redirect, ktery se zavola po uspesnem potvrzeni
+    "dob": "1983-02-24", // datum narození, volitelné
+    "city": "Praha"     // TODO: u nás nastavujeme z číselníku
+}
+< 201
+< Content-Type: application/json
+{
+    "id": 753276,
+    "type": "fan",
+    "url": "/api.fan/username", // API URL
+    "name": "Franta Vomáčka",   // nick
+    "webUrl": "http://bandzone.cz/fan/publicid",
+    "gender": "M",  // M, F, NULL
+    "age": 29,    // or NULL
+    "city": "Praha",    // or NULL
+    "image": {
+        "small": {
+            "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/goqoA11r0iIH29LnA_dBQg6ohtIULMYt.jpg"
+        }
+    }
+}
+
+Potvrzení e-mailu<br>
+Access: W<br>
+Status: draft
+PUT /api.confirm/2aln0oGGX8VrMkxmA9cqjGsV5u0iGoet/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "id": 753276,
+    "type": "fan",
+    "url": "/api.fan/username", // API URL
+    "name": "Franta Vomáčka",   // nick
+    "webUrl": "http://bandzone.cz/fan/publicid",
+    "gender": "M",  // M, F, NULL
+    "age": 29,    // or NULL
+    "city": "Praha",    // or NULL
+    "image": {
+        "small": {
+            "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/goqoA11r0iIH29LnA_dBQg6ohtIULMYt.jpg"
+        }
+    }
+}
