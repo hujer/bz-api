@@ -26,6 +26,9 @@ TODO
 
 Changelog
 --
+2012-11-23<br>
+- POST /api.fan/publicid/notify/ + DELETE /api.fan/publicid/notify/ draft notifikaci
+
 2012-11-22<br>
 - POST /api.session/ nyní vrací data uživatele v response v klíči user (stejně jako GET /api.session/session-id/)<br>
 - Zprovozněno fulltext vyhledávání v api.fan-list, api.band-list, api.gig-list, api.venue-list<br>
@@ -354,6 +357,44 @@ DELETE /api.fan/publicid/favorite-band-list/13290/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
 > User-Token: 5cc3944e93fdf326886c8a225d59aa2e460954fc
+< 200
+< Content-Type: application/json
+{
+    // empty response
+}
+
+Prihlaseni se k odberu notifikaci fanousk publicid<br>
+Access: S<br>
+Status: draft<br>
+Prihlaseni se k notifikacim je mozne provest jen pokud je prihlasenu fanousek a pouze na jeho ucet.<br>
+Zadana URL bude zavolana nasim serverem (POST), kdyz fanouskovi prijde notifikace. URL NESMI presmerovavat.<br>
+Pokud dostaneme navratovy kod 200, povazujeme zpravu za prijatou. Pokud dostaneme 4xx, notifikaci znovu posilat nebudeme.<br>
+Pokud dostaneme 5xx, pokusime se nekolikrat se zvysujicim se odstupem zpravu odeslat znova.<br>
+Zaslana zprava bude obsahovat pole:<br>
+- message: text zpravy<br>
+- url: API url fanouska, pro ktereho je notifikace urcena<br>
+Encodovani dat je mozno si zvolit, budto application/x-www-form-urlencoded (default) nebo application/json
+POST /api.fan/publicid/notify/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> User-Token: 5cc3944e93fdf326886c8a225d59aa2e460954fc
+> Content-Type: application/json
+{
+	"url": "http://our.server/and.some/url/to-be/called-when-notification-received",
+	"content-type": "application/json"  // nepovinne, default je standard application/x-www-form-urlencoded
+}
+< 200
+< Content-Type: application/json
+{
+    // empty response
+}
+
+Zruseni odberu notifikaci u fanouska publicid<br>
+Access: W<br>
+Status: draft
+DELETE /api.fan/publicid/notify
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
 < 200
 < Content-Type: application/json
 {
