@@ -26,8 +26,13 @@ TODO
 
 Changelog
 --
+2012-11-26<br>
+- Zprovozněno HTTPS<br>
+- Zprovozněn GEO search (zatím nejsou data, ale filtry jsou akceptovány) + doc update<br>
+- Zprovozněno přehrávání písniček + doc update<br>
+
 2012-11-23<br>
-- POST /api.fan/publicid/notify/ + DELETE /api.fan/publicid/notify/ draft notifikaci
+- POST /api.fan/publicid/notify/ + DELETE /api.fan/publicid/notify/ draft notifikaci<br>
 
 2012-11-22<br>
 - POST /api.session/ nyní vrací data uživatele v response v klíči user (stejně jako GET /api.session/session-id/)<br>
@@ -35,7 +40,7 @@ Changelog
 - Zprovozněno filtrování dle startDate, endDate v api.gig-list + doc update<br>
 - Doc fix: POST /api.session/ vrací při vytvoření session status 201<br>
 - Doc update: Přidána indikace access levelu pro requesty<br>
-- Update: Ke všem response objektům přidán unikátní klíč id a type (id objektu a jeho typ - fan, band, album - zde jeste id neni, gig, venue, track). Id je unikátní napříč objekty<br>
+- Update: Ke všem response objektům přidán unikátní klíč id a type (id objektu a jeho typ - fan, band, album, gig, venue, track). Id je unikátní napříč objekty<br>
 - Update: u GET /api.album/id/ zmeněn puvodni klic "type" na "media"<br>
 - Zprovozněn GET /api.band/publicid/track-list/ + náhledový výpis u GET /api.band/publicid/<br>
 - Update: Přidán klíč venue u GET /api.gig/id/ pro identifikaci klubu<br>
@@ -420,9 +425,6 @@ GET /api.fan-list/
         "ageMin": null,
         "ageMax": null,
         "gender": null,  // "M", "F", null
-        "lat": null,    // not currently supported
-        "long": null,
-        "radius": null, // 2km, 500m etc.
     },
     "items": [
         {
@@ -1082,7 +1084,8 @@ Status: online, filtrování fulltext parametr q + startDate + endDate, attendee
 Filtry:<br>
 q: fulltext query<br>
 startDate: pocatecni datum koncertu (YYYY-MM-DD), default (null, nezadano) je NOW<br>
-endDate: konecne datum koncertu (YYYY-MM-DD), defualt (null, nezadano) je no limit
+endDate: konecne datum koncertu (YYYY-MM-DD), defualt (null, nezadano) je no limit<br>
+lat, long: 
 GET /api.gig-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1098,7 +1101,7 @@ GET /api.gig-list/
         "q": null,  // fulltext query
         "startDate": null,  // YYYY-MM-DD
         "endDate": null,    // YYYY-MM-DD
-        "lat": null,    // not currently supported
+        "lat": null,
         "long": null,
         "radius": null, // 2km, 500m etc.
     },
