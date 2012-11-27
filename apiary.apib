@@ -26,6 +26,16 @@ TODO
 
 Changelog
 --
+2012-11-27<br>
+- TODO: sjednotíme responses u POST a DELETE *-list/ requestů - teď to není úlpně konzistentní<br>
+- Online mutual friendship ve výpisech<br>
+- Online filtrování fanoušků dle věku a pohlaví<br>
+- Online trackList u kapely a možnost poslechu / přehrávání tracků<br>
+- Online oblíbené kapely: POST /api.fan/publicid/favorite-band-list/, DELETE /api.fan/publicid/favorite-band-list/<br>
+- Online friends: POST /api.fan/publicid/friend-list/, DELETE /api.fan/publicid/friend-list/<br>
+- Online gig attendees: GET /api.gig/id/attendee-list/<br>
+- Online Gig attendance: POST /api.gig/id/attendee-list/, DELETE /api.gig/id/attendee-list/<br>
+
 2012-11-26<br>
 - Zprovozněno HTTPS<br>
 - Zprovozněn GEO search (zatím nejsou data, ale filtry jsou akceptovány) + doc update<br>
@@ -223,7 +233,7 @@ GET /api.fan/publicid/favorite-band-list/?page=1
 
 Pridani kapely do oblibenych - prida kapelu s "id" do oblibenych kapel fanouska publicid (fanousek publicid zalajkuje kapelu s "id")<br>
 Access: S<br>
-Status: draft
+Status: online
 POST /api.fan/publicid/favorite-band-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -251,7 +261,7 @@ POST /api.fan/publicid/favorite-band-list/
 
 Odebrani kapely z oblibenych - odebere kapelu s "id" z oblibenych kapel fanouska publicid<br>
 Access: S<br>
-Status: draft
+Status: online
 DELETE /api.fan/publicid/favorite-band-list/7827/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -264,7 +274,7 @@ DELETE /api.fan/publicid/favorite-band-list/7827/
 
 Seznam pratel uzivatele publicid<br>
 Access: R<br>
-Status: online krome mutual friendship
+Status: online
 GET /api.fan/publicid/friend-list/?page=2
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -327,7 +337,7 @@ GET /api.fan/publicid/friend-list/?page=2
 
 Pridani fanouska do pratel - prida fanouska s "id" do pratel fanouska publicid<br>
 Access: S<br>
-Status: draft
+Status: online
 POST /api.fan/publicid/friend-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -357,7 +367,7 @@ POST /api.fan/publicid/friend-list/
 
 Odebrani fanouska z pratel - odebere fanouska s "id" z pratel fanouska publicid<br>
 Access: S<br>
-Status: draft
+Status: online
 DELETE /api.fan/publicid/favorite-band-list/13290/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -408,7 +418,7 @@ DELETE /api.fan/publicid/notify
 
 Výpis fanoušků = uživatelů<br>
 Access: R<br>
-Status: online, filtrování jen fulltext parametr q
+Status: online
 GET /api.fan-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -466,7 +476,7 @@ Band / Kapela
 --
 Vypise data kapely publicid<br>
 Access: R<br>
-Status: online kromě trackList
+Status: online
 GET /api.band/publicid/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -587,7 +597,7 @@ GET /api.band/publicid/
 
 Seznam tracku kapely publicid<br>
 Access: R<br>
-Status: online, TODO track playing
+Status: online
 GET /api.band/publicid/track-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -604,7 +614,7 @@ GET /api.band/publicid/track-list/
             "id": 68055,
             "type": "track",
             "url": "/api.track/45324/",
-            "playUrl": "/api.track/45324/play/", // URL for audio playing - TODO
+            "playUrl": "/api.track/45324/play/", // URL for audio playing
             "name": "Papiňák s benzínem",
             "plays": 1203
         },
@@ -612,7 +622,7 @@ GET /api.band/publicid/track-list/
             "id": 68072,
             "type": "track",
             "url": "/api.track/53641/",
-            "playUrl": "/api.track/53641/play/", // URL for audio playing - TODO
+            "playUrl": "/api.track/53641/play/", // URL for audio playing
             "name": "Babička Věra",
             "plays": 1431
         },
@@ -764,7 +774,7 @@ GET /api.band/publicid/fan-list/?page=33
 
 Výpis kapel<br>
 Access: R<br>
-Status: online, filtrování jen fulltext parametr q
+Status: online
 GET /api.band-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -815,7 +825,7 @@ GET /api.band-list/
 -- Tracky --
 Vypise detaily tracku<br>
 Access: R<br>
-Status: online, TODO track play
+Status: online
 GET /api.track/45324/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -826,28 +836,24 @@ GET /api.track/45324/
     "type": "track",
     "url": "/api.track/45324/",
     "name": "Papiňák s benzínem",
-    "playUrl": "/api.track/45324/play/",    // TODO
+    "playUrl": "/api.track/45324/play/",
     "plays": 1203
-    // TODO: additional info
 }
 
 Prehrani tracku<br>
 Access: W<br>
-Status: TODO
+Status: online
 GET /api.track/45324/play/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
 > Session-Id: 03487c7b2673a260f68537d65f5b9d0e64864302
-< 200
-< Content-Type: application/json
-{
-    // TODO: vymyslet, jak bude fungovat - melo by tu byt URL pro zapocitani prehrani apod.
-}
+< 302 Found
+< Location: http://media.bandzone.cz/mp3/url.mp3
 
 -- Gig / Akce --
 Vypise data akce id<br>
 Access: R<br>
-Status: online kromě attendeeList
+Status: online
 GET /api.gig/id/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1001,7 +1007,7 @@ GET /api.gig/id/band-list/?page=1
 
 Vypise fanousky chystajici se na akci id<br>
 Access: R<br>
-Status: draft
+Status: online
 GET /api.gig/id/attendee-list/?page=1
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1049,7 +1055,7 @@ GET /api.gig/id/attendee-list/?page=1
 
 Pridani fanouska na attendee-list akce
 Access: S<br>
-Status: draft+TODO
+Status: online+TODO
 POST /api.gig/id/attendee-list/?page=1
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1057,17 +1063,25 @@ POST /api.gig/id/attendee-list/?page=1
 > Content-Type: application/json
 {
     "id": 13222,  // id fanouska, ktereho chceme pridat na attendee-list (musi se shodovat s prihlasenym)
-    "type": "C"     // "C" = pridat do kalendare (neverejny attending), "A" nebo not set = jdu (verejny attending)
+    "type": "C"   // TODO: "C" = pridat do kalendare (neverejny attending), "A" nebo not set = jdu (verejny attending)
 }
 < 201
 < Content-Type: application/json
 {
-    //TODO
+	// info o fanouškovi, který se přidal - TODO: lépe info o gigu?
+    "id": 13190,
+    "type": "fan",
+    "url": "/api.fan/publicid/", // API URL
+    "webUrl": "http://bandzone.cz/fan/publicid",    // web URL
+    "name": "User Name",    // jmeno = nick
+    "gender": "M",  // M, F, null
+    "age": 29,    // or null
+    "city": "Praha"    // or null
 }
 
 Smazani fanouska z attendee-listu akce
 Access: S<br>
-Status: draft+TODO
+Status: online+TODO
 DELETE /api.gig/id/attendee-list/13222/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1075,17 +1089,25 @@ DELETE /api.gig/id/attendee-list/13222/
 < 200
 < Content-Type: application/json
 {
-    // empty response
+	// info o fanouškovi, který se přidal - TODO: lépe info o gigu?
+    "id": 13190,
+    "type": "fan",
+    "url": "/api.fan/publicid/", // API URL
+    "webUrl": "http://bandzone.cz/fan/publicid",    // web URL
+    "name": "User Name",    // jmeno = nick
+    "gender": "M",  // M, F, null
+    "age": 29,    // or null
+    "city": "Praha"    // or null
 }
 
 Výpis / hledání akcí<br>
 Access: R<br>
-Status: online, filtrování fulltext parametr q + startDate + endDate, attendeeList draft<br>
+Status: online<br>
 Filtry:<br>
 q: fulltext query<br>
 startDate: pocatecni datum koncertu (YYYY-MM-DD), default (null, nezadano) je NOW<br>
 endDate: konecne datum koncertu (YYYY-MM-DD), defualt (null, nezadano) je no limit<br>
-lat, long: 
+lat, long:
 GET /api.gig-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1238,7 +1260,7 @@ GET /api.venue/id/
 
 Vypis klubu<br>
 Access: R<br>
-Status: online, filtrování jen fulltext parametr q
+Status: online
 GET /api.venue-list/?q=fleda
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
