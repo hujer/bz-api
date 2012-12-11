@@ -2,7 +2,7 @@ HOST: http://bandzone.cz/
 
 --- BZ API v.0.2 ---
 ---
-Basics TEST
+Basics
 --
 API funguje read-only i bez header fields Client-Id a Client-Key.<br>
 Pro prihlasovani a dalsi funkce je nutno mit platnou kombinaci Client-Id a Client-Key.<br>
@@ -505,7 +505,7 @@ GET /api.band/publicid/
                 "id": 68055,
                 "type": "track",
                 "url": "/api.track/45324/",
-                "playUrl": "/api.track/45324/play/", // URL for audio playing - TODO
+                "playUrl": "/api.track/45324/play/", // URL for audio playing
                 "name": "Papiňák s benzínem",
                 "plays": 1203
             },
@@ -513,7 +513,7 @@ GET /api.band/publicid/
                 "id": 68072,
                 "type": "track",
                 "url": "/api.track/53641/",
-                "playUrl": "/api.track/53641/play/", // URL for audio playing - TODO
+                "playUrl": "/api.track/53641/play/", // URL for audio playing
                 "name": "Babička Věra",
                 "plays": 1431
             }
@@ -846,6 +846,7 @@ GET /api.track/45324/play/
 < 302
 < Location: http://media.bandzone.cz/mp3/url.mp3
 
+
 -- Gig / Akce --
 Vypise data akce id<br>
 Access: R<br>
@@ -882,7 +883,7 @@ GET /api.gig/id/
         "long": 16.6032350,
         "externalUrl": "http://fleda.cz/"
     },
-    "info": "Astrální hardcoreoví bojovníci kmene Insania v čele s náčelníkem Polym oslaví 25 let své divoké existence.",
+    "info": "Astrální hardcoreoví bojovníci kmene Insania v čele s náčelníkem Polym oslaví 25 let své divoké existence. Jedním z gratulantů bude i legendární Našrot.\nTento večer skalpel provede živý řez čtvrtstoletím. Zazní něco ze starších nevergreenů a na prknech, co znamenají podsvětí, se zjeví bývalí členové. Korunu celému večeru nasadí masová spiritistická seance, při níž bude vyvolána historická, zakládající sestava INSANIE z roku 987, která zahraje \"hudbu\" z téhle doby. Povinná účast pro milovníky obskurních temných událostí, které už se nebudou nikdy opakovat. Leda snad za dalších 25 let?",
     "attendeeList": {   // preview of few items
         "url": "/api.gig/id/attendee-list/",
         "total": 66,
