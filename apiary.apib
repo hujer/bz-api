@@ -27,12 +27,11 @@ TODO
 Changelog
 --
 2012-12-19<br>
-- U všech fan objektů ve všech výpisech jsou klíče "friend" a "mutual" (true / false) značící přátelství k přihlášenému uživateli (vždy false, pokud je uživatel guest)
-- U všech band objektů ve všech výpisech je klíč "favorite" (true / false) značící oblíbenost kapely
-- U všech gig objektů ve všech výpisech je klíč "attending" ("A", "C" / false) značící attending vzhledem k přihlášenému uživateli (A - attending, C - kalendář)
-- Přidány GPS lokace klubů v Jihočeském, Plzeňském a Karlovarském kraji
-- Přidáno URL /api.fan/publicid/attending-list/ - seznam akcí, kam se fanoušek chystá (zatím jen budoucí)
-
+- U všech fan objektů ve všech výpisech jsou klíče "friend" a "mutual" (true / false) značící přátelství k přihlášenému uživateli (vždy false, pokud je uživatel guest)<br>
+- U všech band objektů ve všech výpisech je klíč "favorite" (true / false) značící oblíbenost kapely<br>
+- U všech gig objektů ve všech výpisech je klíč "attending" ("A", "C" / false) značící attending vzhledem k přihlášenému uživateli (A - attending, C - kalendář)<br>
+- Přidány GPS lokace klubů v Jihočeském, Plzeňském a Karlovarském kraji<br>
+- Přidáno URL /api.fan/publicid/attending-list/ - seznam akcí, kam se fanoušek chystá (zatím jen budoucí)<br>
 
 2012-11-27<br>
 - TODO: sjednotíme responses u POST a DELETE *-list/ requestů - teď to není úlpně konzistentní<br>
@@ -376,7 +375,7 @@ POST /api.fan/publicid/friend-list/
 Odebrani fanouska z pratel - odebere fanouska s "id" z pratel fanouska publicid<br>
 Access: S<br>
 Status: online
-DELETE /api.fan/publicid/favorite-band-list/13290/
+DELETE /api.fan/publicid/friend-list/13290/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
 > User-Token: 5cc3944e93fdf326886c8a225d59aa2e460954fc
@@ -385,6 +384,70 @@ DELETE /api.fan/publicid/favorite-band-list/13290/
 {
     // empty response
 }
+
+Seznam akci, kam se chysta fan publicid
+Access: R<br>
+Status: online
+GET /api.fan/publicid/attending-list/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "url": "/api.fan/publicid/attending-list/",
+    "total": 54,
+    "totalPages": 6,
+    "page": 2,
+    "pageSize": 10,
+    "items": [
+        {
+            "id": 13290,
+            "type": "fan",
+            "url": "/api.fan/trta/",
+            "webUrl": "http://bandzone.cz/fan/trta",
+            "name": "ʕ •ᴥ•ʔ křupavoučká jitrnice",
+            "gender": "F",
+            "age": 30,
+            "city": "Nýmand berk",
+            "mutual": true,     // mutual friendship?
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/fan/tr/trta/gallery/profile.default/GfCcQir0ZKMjkjZhN1vGvSxXaaym0P8H.jpg"
+                },
+                "profile": {
+                    "url": "http://usr.bandzone.cz/fan/tr/trta/gallery/profile.default/wCpsUy_CnTD8z68o3oXlwyI9XKoKOIVl.jpg"
+                },
+                "full": {
+                    "url": "http://usr.bandzone.cz/fan/tr/trta/gallery/profile.default/Not3GryogCJI0qWVDMDo_rc6soPwaCpg.jpg"
+                }
+            }
+        },
+        {
+            "id": 13189,
+            "type": "fan",
+            "url": "/api.fan/majklac/",
+            "webUrl": "http://bandzone.cz/fan/majklac",
+            "name": "Majkláč",
+            "gender": "M",
+            "age": 33,
+            "city": "Praha",
+            "mutual": false,    // mutual friendship?
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/dT9BOUxUeJ9mBLLT3G-0mLE3fX6KWyyf.jpg"
+                },
+                "profile": {
+                    "url": "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/He1HyrwrpTjYjKfSPoz6l66dkif7W3UD.jpg"
+                },
+                "full": {
+                    "url" : "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/Y50pz4zZnn0SS0NMfgnX4w05xO7oGq5V.jpg"
+                }
+            }
+        }
+        // repeat
+    ]
+}
+
 
 Prihlaseni se k odberu notifikaci fanousk publicid<br>
 Access: S<br>
@@ -894,6 +957,7 @@ GET /api.gig/id/
         "externalUrl": "http://fleda.cz/"
     },
     "info": "Astrální hardcoreoví bojovníci kmene Insania v čele s náčelníkem Polym oslaví 25 let své divoké existence. Jedním z gratulantů bude i legendární Našrot.\nTento večer skalpel provede živý řez čtvrtstoletím. Zazní něco ze starších nevergreenů a na prknech, co znamenají podsvětí, se zjeví bývalí členové. Korunu celému večeru nasadí masová spiritistická seance, při níž bude vyvolána historická, zakládající sestava INSANIE z roku 987, která zahraje \"hudbu\" z téhle doby. Povinná účast pro milovníky obskurních temných událostí, které už se nebudou nikdy opakovat. Leda snad za dalších 25 let?",
+    "attending": false, // "A", "C" nebo false
     "attendeeList": {   // preview of few items
         "url": "/api.gig/id/attendee-list/",
         "total": 66,
@@ -1162,6 +1226,7 @@ GET /api.gig-list/
                 "long": 16.6032350,
                 "externalUrl": "http://fleda.cz/"
             },
+            "attending": "A",
             "attendeeList": {   // preview of few items
                 "url": "/api.gig/id/attendee-list",
                 "total": 66,
