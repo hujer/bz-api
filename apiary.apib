@@ -1499,10 +1499,8 @@ PUT /api.confirm/2aln0oGGX8VrMkxmA9cqjGsV5u0iGoet/
     }
 }
 
---
-Upload souborů
---
-POSTuje se na jednotnou API url /api.upload/, která vrací id (a další metadata) vytvořeného souboru. Toto id se
+-- Upload souborů --
+Vola se POST uje se na jednotnou API url /api.upload/, která vrací id (a další metadata) vytvořeného souboru. Toto id se
 použije při dalších volání API, kde je třeba uploadovaný soubor (registrace atp.).
 
 
@@ -1518,7 +1516,7 @@ POST /api.upload/
 < Content-Type: application/json
 {
     "id": "ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c",
-    "fileName": "kittens_do_not_click.jpg"
+    "fileName": "kittens_do_not_click.jpg",
     "mimeType": "image/jpeg", // Detekovany mimetyp
     "size": 46387, // Velikost v bytech
     "sizeText": "45.3KB", // Velikost human readable
@@ -1549,7 +1547,7 @@ GET /api.upload/ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c
 < Content-Type: application/json
 {
     "id": "ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c",
-    "fileName": "kittens_do_not_click.jpg"
+    "fileName": "kittens_do_not_click.jpg",
     "mimeType": "image/jpeg", // Detekovany mimetyp
     "size": 46387, // Velikost v bytech
     "sizeText": "45.3KB", // Velikost human readable
