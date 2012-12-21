@@ -26,8 +26,30 @@ TODO
 
 Changelog
 --
+2012-12-19<br>
+- U všech fan objektů ve všech výpisech jsou klíče "friend" a "mutual" (true / false) značící přátelství k přihlášenému uživateli (vždy false, pokud je uživatel guest)<br>
+- U všech band objektů ve všech výpisech je klíč "favorite" (true / false) značící oblíbenost kapely<br>
+- U všech gig objektů ve všech výpisech je klíč "attending" ("A", "C" / false) značící attending vzhledem k přihlášenému uživateli (A - attending, C - kalendář)<br>
+- Přidány GPS lokace klubů v Jihočeském, Plzeňském a Karlovarském kraji<br>
+- Přidáno URL /api.fan/publicid/attending-list/ - seznam akcí, kam se fanoušek chystá (zatím jen budoucí)<br>
+
+2012-11-27<br>
+- TODO: sjednotíme responses u POST a DELETE *-list/ requestů - teď to není úlpně konzistentní<br>
+- Online mutual friendship ve výpisech<br>
+- Online filtrování fanoušků dle věku a pohlaví<br>
+- Online trackList u kapely a možnost poslechu / přehrávání tracků<br>
+- Online oblíbené kapely: POST /api.fan/publicid/favorite-band-list/, DELETE /api.fan/publicid/favorite-band-list/<br>
+- Online friends: POST /api.fan/publicid/friend-list/, DELETE /api.fan/publicid/friend-list/<br>
+- Online gig attendees: GET /api.gig/id/attendee-list/<br>
+- Online Gig attendance: POST /api.gig/id/attendee-list/, DELETE /api.gig/id/attendee-list/<br>
+
+2012-11-26<br>
+- Zprovozněno HTTPS<br>
+- Zprovozněn GEO search (zatím nejsou data, ale filtry jsou akceptovány) + doc update<br>
+- Zprovozněno přehrávání písniček + doc update<br>
+
 2012-11-23<br>
-- POST /api.fan/publicid/notify/ + DELETE /api.fan/publicid/notify/ draft notifikaci
+- POST /api.fan/publicid/notify/ + DELETE /api.fan/publicid/notify/ draft notifikaci<br>
 
 2012-11-22<br>
 - POST /api.session/ nyní vrací data uživatele v response v klíči user (stejně jako GET /api.session/session-id/)<br>
@@ -35,7 +57,7 @@ Changelog
 - Zprovozněno filtrování dle startDate, endDate v api.gig-list + doc update<br>
 - Doc fix: POST /api.session/ vrací při vytvoření session status 201<br>
 - Doc update: Přidána indikace access levelu pro requesty<br>
-- Update: Ke všem response objektům přidán unikátní klíč id a type (id objektu a jeho typ - fan, band, album - zde jeste id neni, gig, venue, track). Id je unikátní napříč objekty<br>
+- Update: Ke všem response objektům přidán unikátní klíč id a type (id objektu a jeho typ - fan, band, album, gig, venue, track). Id je unikátní napříč objekty<br>
 - Update: u GET /api.album/id/ zmeněn puvodni klic "type" na "media"<br>
 - Zprovozněn GET /api.band/publicid/track-list/ + náhledový výpis u GET /api.band/publicid/<br>
 - Update: Přidán klíč venue u GET /api.gig/id/ pro identifikaci klubu<br>
@@ -52,9 +74,7 @@ Changelog
 
 ---
 
---
-User / Fan
---
+-- User / Fan --
 Vypise data uzivatele publicid<br>
 Access: R<br>
 Status: online
@@ -69,9 +89,11 @@ GET /api.fan/publicid/
     "url": "/api.fan/publicid/", // API URL
     "webUrl": "http://bandzone.cz/fan/publicid",    // web URL
     "name": "User Name",    // jmeno = nick
-    "gender": "M",  // M, F, NULL
-    "age": 29,    // or NULL
-    "city": "Praha",    // or NULL
+    "gender": "M",  // M, F, null
+    "age": 29,    // or null
+    "city": "Praha",    // or null
+    "friend": true,     // pouze pokud je prihlaseny uzivatel
+    "mutual": false,    // -- " --
     "image": {
         "small": {  // ctvercovy vyrez 58x58px
             "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/goqoA11r0iIH29LnA_dBQg6ohtIULMYt.jpg"
@@ -130,7 +152,7 @@ GET /api.fan/publicid/
                 "gender": "F",
                 "age": 30,
                 "city": "Nýmand berk",
-                "mutual": TRUE, // mutual friendship?
+                "mutual": true, // pouze pri session, mutual friendship?
                 "image": {
                     "small": {
                         "url": "http://usr.bandzone.cz/fan/tr/trta/gallery/profile.default/GfCcQir0ZKMjkjZhN1vGvSxXaaym0P8H.jpg"
@@ -146,7 +168,7 @@ GET /api.fan/publicid/
                 "gender": "M",
                 "age": 33,
                 "city": "Praha",
-                "mutual": FALSE, // mutual friendship?
+                "mutual": false, // pouze pri session, mutual friendship?
                 "image": {
                     "small": {
                         "url": "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/dT9BOUxUeJ9mBLLT3G-0mLE3fX6KWyyf.jpg"
@@ -218,7 +240,7 @@ GET /api.fan/publicid/favorite-band-list/?page=1
 
 Pridani kapely do oblibenych - prida kapelu s "id" do oblibenych kapel fanouska publicid (fanousek publicid zalajkuje kapelu s "id")<br>
 Access: S<br>
-Status: draft
+Status: online
 POST /api.fan/publicid/favorite-band-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -246,7 +268,7 @@ POST /api.fan/publicid/favorite-band-list/
 
 Odebrani kapely z oblibenych - odebere kapelu s "id" z oblibenych kapel fanouska publicid<br>
 Access: S<br>
-Status: draft
+Status: online
 DELETE /api.fan/publicid/favorite-band-list/7827/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -259,7 +281,7 @@ DELETE /api.fan/publicid/favorite-band-list/7827/
 
 Seznam pratel uzivatele publicid<br>
 Access: R<br>
-Status: online krome mutual friendship
+Status: online
 GET /api.fan/publicid/friend-list/?page=2
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -281,7 +303,7 @@ GET /api.fan/publicid/friend-list/?page=2
             "gender": "F",
             "age": 30,
             "city": "Nýmand berk",
-            "mutual": TRUE,     // mutual friendship?
+            "mutual": true,     // mutual friendship?
             "image": {
                 "small": {
                     "url": "http://usr.bandzone.cz/fan/tr/trta/gallery/profile.default/GfCcQir0ZKMjkjZhN1vGvSxXaaym0P8H.jpg"
@@ -296,14 +318,14 @@ GET /api.fan/publicid/friend-list/?page=2
         },
         {
             "id": 13189,
-            "type": "fan"
+            "type": "fan",
             "url": "/api.fan/majklac/",
             "webUrl": "http://bandzone.cz/fan/majklac",
             "name": "Majkláč",
             "gender": "M",
             "age": 33,
             "city": "Praha",
-            "mutual": FALSE,    // mutual friendship?
+            "mutual": false,    // mutual friendship?
             "image": {
                 "small": {
                     "url": "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/dT9BOUxUeJ9mBLLT3G-0mLE3fX6KWyyf.jpg"
@@ -322,7 +344,7 @@ GET /api.fan/publicid/friend-list/?page=2
 
 Pridani fanouska do pratel - prida fanouska s "id" do pratel fanouska publicid<br>
 Access: S<br>
-Status: draft
+Status: online
 POST /api.fan/publicid/friend-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -342,7 +364,7 @@ POST /api.fan/publicid/friend-list/
     "gender": "F",
     "age": 30,
     "city": "Nýmand berk",
-    "mutual": TRUE,     // mutual friendship?
+    "mutual": true,     // mutual friendship?
     "image": {
         "small": {
             "url": "http://usr.bandzone.cz/fan/tr/trta/gallery/profile.default/GfCcQir0ZKMjkjZhN1vGvSxXaaym0P8H.jpg"
@@ -352,8 +374,8 @@ POST /api.fan/publicid/friend-list/
 
 Odebrani fanouska z pratel - odebere fanouska s "id" z pratel fanouska publicid<br>
 Access: S<br>
-Status: draft
-DELETE /api.fan/publicid/favorite-band-list/13290/
+Status: online
+DELETE /api.fan/publicid/friend-list/13290/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
 > User-Token: 5cc3944e93fdf326886c8a225d59aa2e460954fc
@@ -362,6 +384,70 @@ DELETE /api.fan/publicid/favorite-band-list/13290/
 {
     // empty response
 }
+
+Seznam akci, kam se chysta fan publicid
+Access: R<br>
+Status: online
+GET /api.fan/publicid/attending-list/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "url": "/api.fan/publicid/attending-list/",
+    "total": 54,
+    "totalPages": 6,
+    "page": 2,
+    "pageSize": 10,
+    "items": [
+        {
+            "id": 13290,
+            "type": "fan",
+            "url": "/api.fan/trta/",
+            "webUrl": "http://bandzone.cz/fan/trta",
+            "name": "ʕ •ᴥ•ʔ křupavoučká jitrnice",
+            "gender": "F",
+            "age": 30,
+            "city": "Nýmand berk",
+            "mutual": true,     // mutual friendship?
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/fan/tr/trta/gallery/profile.default/GfCcQir0ZKMjkjZhN1vGvSxXaaym0P8H.jpg"
+                },
+                "profile": {
+                    "url": "http://usr.bandzone.cz/fan/tr/trta/gallery/profile.default/wCpsUy_CnTD8z68o3oXlwyI9XKoKOIVl.jpg"
+                },
+                "full": {
+                    "url": "http://usr.bandzone.cz/fan/tr/trta/gallery/profile.default/Not3GryogCJI0qWVDMDo_rc6soPwaCpg.jpg"
+                }
+            }
+        },
+        {
+            "id": 13189,
+            "type": "fan",
+            "url": "/api.fan/majklac/",
+            "webUrl": "http://bandzone.cz/fan/majklac",
+            "name": "Majkláč",
+            "gender": "M",
+            "age": 33,
+            "city": "Praha",
+            "mutual": false,    // mutual friendship?
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/dT9BOUxUeJ9mBLLT3G-0mLE3fX6KWyyf.jpg"
+                },
+                "profile": {
+                    "url": "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/He1HyrwrpTjYjKfSPoz6l66dkif7W3UD.jpg"
+                },
+                "full": {
+                    "url" : "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/Y50pz4zZnn0SS0NMfgnX4w05xO7oGq5V.jpg"
+                }
+            }
+        }
+        // repeat
+    ]
+}
+
 
 Prihlaseni se k odberu notifikaci fanousk publicid<br>
 Access: S<br>
@@ -381,7 +467,7 @@ POST /api.fan/publicid/notify/
 > Content-Type: application/json
 {
     "url": "http://our.server/and.some/url/to-be/called-when-notification-received",
-	"content-type": "application/json"  // nepovinne, default je standard application/x-www-form-urlencoded
+    "content-type": "application/json"  // nepovinne, default je standard application/x-www-form-urlencoded
 }
 < 200
 < Content-Type: application/json
@@ -392,7 +478,7 @@ POST /api.fan/publicid/notify/
 Zruseni odberu notifikaci u fanouska publicid<br>
 Access: W<br>
 Status: draft
-DELETE /api.fan/publicid/notify
+DELETE /api.fan/publicid/notify/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
 < 200
@@ -403,7 +489,7 @@ DELETE /api.fan/publicid/notify
 
 Výpis fanoušků = uživatelů<br>
 Access: R<br>
-Status: online, filtrování jen fulltext parametr q
+Status: online
 GET /api.fan-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -416,13 +502,10 @@ GET /api.fan-list/
     "page": 1,
     "pageSize": 10,
     "filters": {    // NIY
-        "q": NULL,  // fulltext query
-        "ageMin": NULL,
-        "ageMax": NULL,
-        "gender": NULL,  // "M", "F", NULL
-        "lat": NULL,    // not currently supported
-        "long": NULL,
-        "radius": NULL, // 2km, 500m etc.
+        "q": null,  // fulltext query
+        "ageMin": null,
+        "ageMax": null,
+        "gender": null,  // "M", "F", null
     },
     "items": [
         {
@@ -431,7 +514,7 @@ GET /api.fan-list/
             "url": "/api.fan/mikakoffin/",
             "webUrl": "http://bandzone.cz/fan/mikakoffin",
             "name": "Mika Koffin",
-            "gender": NULL,
+            "gender": null,
             "age": 34,
             "city": "Brno",
             "image": {
@@ -459,12 +542,10 @@ GET /api.fan-list/
     ]
 }
 
---
-Band / Kapela
---
+-- Band / Kapela --
 Vypise data kapely publicid<br>
 Access: R<br>
-Status: online kromě trackList
+Status: online
 GET /api.band/publicid/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -497,7 +578,7 @@ GET /api.band/publicid/
                 "id": 68055,
                 "type": "track",
                 "url": "/api.track/45324/",
-                "playUrl": "/api.track/45324/play/", // URL for audio playing - TODO
+                "playUrl": "/api.track/45324/play/", // URL for audio playing
                 "name": "Papiňák s benzínem",
                 "plays": 1203
             },
@@ -505,7 +586,7 @@ GET /api.band/publicid/
                 "id": 68072,
                 "type": "track",
                 "url": "/api.track/53641/",
-                "playUrl": "/api.track/53641/play/", // URL for audio playing - TODO
+                "playUrl": "/api.track/53641/play/", // URL for audio playing
                 "name": "Babička Věra",
                 "plays": 1431
             }
@@ -555,7 +636,7 @@ GET /api.band/publicid/
                 "url": "/api.fan/mikakoffin",
                 "webUrl": "http://bandzone.cz/fan/mikakoffin",
                 "name": "Mika Koffin",
-                "gender": NULL,
+                "gender": null,
                 "age": 34,
                 "city": "Brno",
                 "image": {
@@ -585,7 +666,7 @@ GET /api.band/publicid/
 
 Seznam tracku kapely publicid<br>
 Access: R<br>
-Status: online, TODO track playing
+Status: online
 GET /api.band/publicid/track-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -602,7 +683,7 @@ GET /api.band/publicid/track-list/
             "id": 68055,
             "type": "track",
             "url": "/api.track/45324/",
-            "playUrl": "/api.track/45324/play/", // URL for audio playing - TODO
+            "playUrl": "/api.track/45324/play/", // URL for audio playing
             "name": "Papiňák s benzínem",
             "plays": 1203
         },
@@ -610,7 +691,7 @@ GET /api.band/publicid/track-list/
             "id": 68072,
             "type": "track",
             "url": "/api.track/53641/",
-            "playUrl": "/api.track/53641/play/", // URL for audio playing - TODO
+            "playUrl": "/api.track/53641/play/", // URL for audio playing
             "name": "Babička Věra",
             "plays": 1431
         },
@@ -720,7 +801,7 @@ GET /api.band/publicid/fan-list/?page=33
             "url": "/api.fan/mikakoffin/",
             "webUrl": "http://bandzone.cz/fan/mikakoffin",
             "name": "Mika Koffin",
-            "gender": NULL,
+            "gender": null,
             "age": 34,
             "city": "Brno",
             "image": {
@@ -762,7 +843,7 @@ GET /api.band/publicid/fan-list/?page=33
 
 Výpis kapel<br>
 Access: R<br>
-Status: online, filtrování jen fulltext parametr q
+Status: online
 GET /api.band-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -775,7 +856,7 @@ GET /api.band-list/
     "page": 1,
     "pageSize": 10,
     "filters": {
-        "q": NULL,  // fulltext query
+        "q": null,  // fulltext query
     },
     "items": [
         {
@@ -813,7 +894,7 @@ GET /api.band-list/
 -- Tracky --
 Vypise detaily tracku<br>
 Access: R<br>
-Status: online, TODO track play
+Status: online
 GET /api.track/45324/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -824,28 +905,25 @@ GET /api.track/45324/
     "type": "track",
     "url": "/api.track/45324/",
     "name": "Papiňák s benzínem",
-    "playUrl": "/api.track/45324/play/",    // TODO
+    "playUrl": "/api.track/45324/play/",
     "plays": 1203
-    // TODO: additional info
 }
 
 Prehrani tracku<br>
 Access: W<br>
-Status: TODO
+Status: online
 GET /api.track/45324/play/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
 > Session-Id: 03487c7b2673a260f68537d65f5b9d0e64864302
-< 200
-< Content-Type: application/json
-{
-    // TODO: vymyslet, jak bude fungovat - melo by tu byt URL pro zapocitani prehrani apod.
-}
+< 302
+< Location: http://media.bandzone.cz/mp3/url.mp3
+
 
 -- Gig / Akce --
 Vypise data akce id<br>
 Access: R<br>
-Status: online kromě attendeeList
+Status: online
 GET /api.gig/id/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -859,8 +937,8 @@ GET /api.gig/id/
     "name": "25 LET REVOLTY",
     "startDate": "2012-10-06",
     "startTime": "20:00:00",
-    "endDate": NULL,
-    "endTime": NULL,
+    "endDate": null,
+    "endTime": null,
     "entry": "190 Kč na místě",
     "entryType": "C",    // C = custom (paid?), F = free, V = voluntary
     "city": "Brno",
@@ -879,6 +957,7 @@ GET /api.gig/id/
         "externalUrl": "http://fleda.cz/"
     },
     "info": "Astrální hardcoreoví bojovníci kmene Insania v čele s náčelníkem Polym oslaví 25 let své divoké existence. Jedním z gratulantů bude i legendární Našrot.\nTento večer skalpel provede živý řez čtvrtstoletím. Zazní něco ze starších nevergreenů a na prknech, co znamenají podsvětí, se zjeví bývalí členové. Korunu celému večeru nasadí masová spiritistická seance, při níž bude vyvolána historická, zakládající sestava INSANIE z roku 987, která zahraje \"hudbu\" z téhle doby. Povinná účast pro milovníky obskurních temných událostí, které už se nebudou nikdy opakovat. Leda snad za dalších 25 let?",
+    "attending": false, // "A", "C" nebo false
     "attendeeList": {   // preview of few items
         "url": "/api.gig/id/attendee-list/",
         "total": 66,
@@ -889,7 +968,7 @@ GET /api.gig/id/
                 "url": "/api.fan/mikakoffin",
                 "webUrl": "http://bandzone.cz/fan/mikakoffin",
                 "name": "Mika Koffin",
-                "gender": NULL,
+                "gender": null,
                 "age": 34,
                 "city": "Brno",
                 "image": {
@@ -999,7 +1078,7 @@ GET /api.gig/id/band-list/?page=1
 
 Vypise fanousky chystajici se na akci id<br>
 Access: R<br>
-Status: draft
+Status: online
 GET /api.gig/id/attendee-list/?page=1
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1018,7 +1097,7 @@ GET /api.gig/id/attendee-list/?page=1
             "url": "/api.fan/mikakoffin",
             "webUrl": "http://bandzone.cz/fan/mikakoffin",
             "name": "Mika Koffin",
-            "gender": NULL,
+            "gender": null,
             "age": 34,
             "city": "Brno",
             "image": {
@@ -1047,7 +1126,7 @@ GET /api.gig/id/attendee-list/?page=1
 
 Pridani fanouska na attendee-list akce
 Access: S<br>
-Status: draft+TODO
+Status: online+TODO
 POST /api.gig/id/attendee-list/?page=1
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1055,17 +1134,25 @@ POST /api.gig/id/attendee-list/?page=1
 > Content-Type: application/json
 {
     "id": 13222,  // id fanouska, ktereho chceme pridat na attendee-list (musi se shodovat s prihlasenym)
-    "type": "C"     // "C" = pridat do kalendare (neverejny attending), "A" nebo not set = jdu (verejny attending)
+    "type": "C"   // TODO: "C" = pridat do kalendare (neverejny attending), "A" nebo not set = jdu (verejny attending)
 }
 < 201
 < Content-Type: application/json
 {
-    //TODO
+    // info o fanouškovi, který se přidal - TODO: lépe info o gigu?
+    "id": 13190,
+    "type": "fan",
+    "url": "/api.fan/publicid/", // API URL
+    "webUrl": "http://bandzone.cz/fan/publicid",    // web URL
+    "name": "User Name",    // jmeno = nick
+    "gender": "M",  // M, F, null
+    "age": 29,    // or null
+    "city": "Praha"    // or null
 }
 
 Smazani fanouska z attendee-listu akce
 Access: S<br>
-Status: draft+TODO
+Status: online+TODO
 DELETE /api.gig/id/attendee-list/13222/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1073,16 +1160,25 @@ DELETE /api.gig/id/attendee-list/13222/
 < 200
 < Content-Type: application/json
 {
-    // empty response
+	// info o fanouškovi, který se přidal - TODO: lépe info o gigu?
+    "id": 13190,
+    "type": "fan",
+    "url": "/api.fan/publicid/", // API URL
+    "webUrl": "http://bandzone.cz/fan/publicid",    // web URL
+    "name": "User Name",    // jmeno = nick
+    "gender": "M",  // M, F, null
+    "age": 29,    // or null
+    "city": "Praha"    // or null
 }
 
 Výpis / hledání akcí<br>
 Access: R<br>
-Status: online, filtrování fulltext parametr q + startDate + endDate, attendeeList draft<br>
+Status: online<br>
 Filtry:<br>
 q: fulltext query<br>
-startDate: pocatecni datum koncertu (YYYY-MM-DD), default (NULL, nezadano) je NOW<br>
-endDate: konecne datum koncertu (YYYY-MM-DD), defualt (NULL, nezadano) je no limit
+startDate: pocatecni datum koncertu (YYYY-MM-DD), default (null, nezadano) je NOW<br>
+endDate: konecne datum koncertu (YYYY-MM-DD), defualt (null, nezadano) je no limit<br>
+lat, long:
 GET /api.gig-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1095,12 +1191,12 @@ GET /api.gig-list/
     "page": 0,
     "pageSize": 10,
     "filters": {    // NIY
-        "q": NULL,  // fulltext query
-        "startDate": NULL,  // YYYY-MM-DD
-        "endDate": NULL,    // YYYY-MM-DD
-        "lat": NULL,    // not currently supported
-        "long": NULL,
-        "radius": NULL, // 2km, 500m etc.
+        "q": null,  // fulltext query
+        "startDate": null,  // YYYY-MM-DD
+        "endDate": null,    // YYYY-MM-DD
+        "lat": null,
+        "long": null,
+        "radius": null, // 2km, 500m etc.
     },
     "items": [
         {
@@ -1111,8 +1207,8 @@ GET /api.gig-list/
             "name": "25 LET REVOLTY",
             "startDate": "2012-10-06",
             "startTime": "20:00:00",
-            "endDate": NULL,
-            "endTime": NULL,
+            "endDate": null,
+            "endTime": null,
             "entry": "190 Kč na místě",
             "entryType": "C",    // C = custom (paid?), F = free, V = voluntary
             "city": "Brno",
@@ -1130,6 +1226,7 @@ GET /api.gig-list/
                 "long": 16.6032350,
                 "externalUrl": "http://fleda.cz/"
             },
+            "attending": "A",
             "attendeeList": {   // preview of few items
                 "url": "/api.gig/id/attendee-list",
                 "total": 66,
@@ -1140,7 +1237,7 @@ GET /api.gig-list/
                         "url": "/api.fan/mikakoffin",
                         "webUrl": "http://bandzone.cz/fan/mikakoffin",
                         "name": "Mika Koffin",
-                        "gender": NULL,
+                        "gender": null,
                         "age": 34,
                         "city": "Brno",
                         "image": {
@@ -1205,9 +1302,7 @@ GET /api.gig-list/
     ]
 }
 
---
-Venues / Kluby
---
+-- Venues / Kluby --
 
 Detail klubu<br>
 Access: R<br>
@@ -1235,7 +1330,7 @@ GET /api.venue/id/
 
 Vypis klubu<br>
 Access: R<br>
-Status: online, filtrování jen fulltext parametr q
+Status: online
 GET /api.venue-list/?q=fleda
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1249,9 +1344,9 @@ GET /api.venue-list/?q=fleda
     "pageSize": 10,
     "filters": {    // NIY
         "q": "fleda",  // fulltext query
-        "lat": NULL,    // not currently supported
-        "long": NULL,
-        "radius": NULL, // 2km, 500m etc.
+        "lat": null,    // not currently supported
+        "long": null,
+        "radius": null, // 2km, 500m etc.
     },
     "items": [
         {
@@ -1273,9 +1368,7 @@ GET /api.venue-list/?q=fleda
     ]
 }
 
---
-Session / Přihlášení / Odhlášení atd.
---
+-- Session / Přihlášení / Odhlášení atd. --
 
 Přihlášení uživatele, získání user tokenu<br>
 201 v případě správne kombinace loginu a hesla<br>
@@ -1286,7 +1379,7 @@ POST /api.session/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
 > Content-Type: application/x-www-form-urlencoded
-login={username}&password={hesloneasi}
+login=username&password=hesloneasi
 < 201
 < Content-Type: application/json
 {
@@ -1298,9 +1391,9 @@ login={username}&password={hesloneasi}
         "url": "/api.fan/publicid", // API URL
         "name": "Franta Vomáčka",   // nick
         "webUrl": "http://bandzone.cz/fan/publicid",
-        "gender": "M",  // M, F, NULL
-        "age": 29,    // or NULL
-        "city": "Praha",    // or NULL
+        "gender": "M",  // M, F, null
+        "age": 29,    // or null
+        "city": "Praha",    // or null
         "image": {
             "small": {
                 "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/goqoA11r0iIH29LnA_dBQg6ohtIULMYt.jpg"
@@ -1323,9 +1416,9 @@ GET /api.session/03487c7b2673a260f68537d65f5b9d0e64864302/
     "url": "/api.fan/publicid", // API URL
     "name": "Franta Vomáčka",   // nick
     "webUrl": "http://bandzone.cz/fan/publicid",
-    "gender": "M",  // M, F, NULL
-    "age": 29,    // or NULL
-    "city": "Praha",    // or NULL
+    "gender": "M",  // M, F, null
+    "age": 29,    // or null
+    "city": "Praha",    // or null
     "image": {
         "small": {
             "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/goqoA11r0iIH29LnA_dBQg6ohtIULMYt.jpg"
@@ -1345,9 +1438,7 @@ DELETE /api.session/03487c7b2673a260f68537d65f5b9d0e64864302/
     // empty response
 }
 
---
-Registrace uživatele
---
+-- Registrace uživatele --
 
 Vytvoření účtu<br>
 Access: W<br>
@@ -1374,9 +1465,9 @@ POST /api.register/
     "url": "/api.fan/username", // API URL
     "name": "Franta Vomáčka",   // nick
     "webUrl": "http://bandzone.cz/fan/publicid",
-    "gender": "M",  // M, F, NULL
-    "age": 29,    // or NULL
-    "city": "Praha",    // or NULL
+    "gender": "M",  // M, F, null
+    "age": 29,    // or null
+    "city": "Praha",    // or null
     "image": {
         "small": {
             "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/goqoA11r0iIH29LnA_dBQg6ohtIULMYt.jpg"
@@ -1398,9 +1489,9 @@ PUT /api.confirm/2aln0oGGX8VrMkxmA9cqjGsV5u0iGoet/
     "url": "/api.fan/username", // API URL
     "name": "Franta Vomáčka",   // nick
     "webUrl": "http://bandzone.cz/fan/publicid",
-    "gender": "M",  // M, F, NULL
-    "age": 29,    // or NULL
-    "city": "Praha",    // or NULL
+    "gender": "M",  // M, F, null
+    "age": 29,    // or null
+    "city": "Praha",    // or null
     "image": {
         "small": {
             "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/goqoA11r0iIH29LnA_dBQg6ohtIULMYt.jpg"
