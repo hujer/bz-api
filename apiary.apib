@@ -1407,3 +1407,66 @@ PUT /api.confirm/2aln0oGGX8VrMkxmA9cqjGsV5u0iGoet/
         }
     }
 }
+
+--
+Upload souborů
+--
+POSTuje se na jednotnou API url /api.upload/, která vrací id (a další metadata) vytvořeného souboru. Toto id se
+použije při dalších volání API, kde je třeba uploadovaný soubor (registrace atp.).
+
+
+Upload souboru<br>
+Access: W<br>
+Status: draft+TODO
+POST /api.upload/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> Content-Type: multipart/form-data
+> Content-Length: 65342
+
+
+< 201
+< Content-Type: application/json
+{
+    "id": "ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c",
+    "fileName": "kittens_do_not_click.jpg"
+    "mimeType": "image/jpeg", // Detekovany mimetyp
+    "size": 46387, // Velikost v bytech
+    "sizeText": "45.3KB", // Velikost human readable
+    "url": "/api.upload/ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c", // API URL
+}
+
+
+Mazání uploadovaného souboru<br>
+Access: W<br>
+Status: draft+TODO
+DELETE /api.upload/ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    // empty response
+}
+
+
+Získání informací o uploadovaném souboru<br>
+Access: W<br>
+Status: draft+TODO
+GET /api.upload/ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+
+
+< 200
+< Content-Type: application/json
+{
+    "id": "ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c",
+    "fileName": "kittens_do_not_click.jpg"
+    "mimeType": "image/jpeg", // Detekovany mimetyp
+    "size": 46387, // Velikost v bytech
+    "sizeText": "45.3KB", // Velikost human readable
+    "url": "/api.upload/ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c", // API URL
+}
+
+
