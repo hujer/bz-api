@@ -29,6 +29,10 @@ Changelog
 2013-01-04<br>
 - Přidáno URL /api.file-upload/ - upload souborů<br>
 
+2012-12-21<br>
+- Číselníky měst, krajů a zemí draft
+- Uploads draft
+
 2012-12-19<br>
 - U všech fan objektů ve všech výpisech jsou klíče "friend" a "mutual" (true / false) značící přátelství k přihlášenému uživateli (vždy false, pokud je uživatel guest)<br>
 - U všech band objektů ve všech výpisech je klíč "favorite" (true / false) značící oblíbenost kapely<br>
@@ -76,6 +80,138 @@ Changelog
 - docs.bz.apiary.io je nyní updatnut tak, že u každého URL je Status:, který značí, v jakém je stavu<br>
 
 ---
+
+-- Číselníky --
+Vypise seznam zemi<br>
+Access: R<br>
+Status: draft
+GET /api.list/country/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "url": "/api.list/country/",
+    "filters": {
+        "q": null   // completer fulltext query
+    },
+    "total": 246,
+    "items": [
+        {
+            "id": 165872,
+            "type": "country",
+            "url": "/api.list/country/165872/",
+            "code": "CZ",
+            "name": "Česko"
+        }
+        // repeat
+    ]
+}
+
+Detail země<br>
+Access: R<br>
+Status: draft
+GET /api.list/country/165872/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "id": 165872,
+    "type": "country",
+    "url": "/api.list/country/165872/",
+    "code": "CZ",
+    "name": "Česko"
+}
+
+Vypise seznam kraju (CZ a SK)<br>
+Access: R<br>
+Status: draft
+GET /api.list/district/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "url": "/api.list/district/",
+    "filters": {
+        "q": null,
+        "country": 165872   // cz
+    },
+    "total": 14,
+    "items": [
+        {
+            "id": 165873,
+            "type": "district",
+            "url": "/api.list/district/165873/",
+            "country": 165872,
+            "name": "Praha"
+        }
+        // repeat
+    ]
+}
+
+Detail kraje<br>
+Access: R<br>
+Status: draft
+GET /api.list/district/165873/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "id": 165873,
+    "type": "district",
+    "url": "/api.list/district/165873/",
+    "country": 165872,
+    "name": "Praha"
+}
+
+Vypise seznam mest (CZ a SK)<br>
+Access: R<br>
+Status: draft
+GET /api.list/city/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "url": "/api.list/city/",
+    "filters": {
+        "q": null,   // completer fulltext query
+        "country": 165872,   // cz
+        "district": 165878
+    },
+    "total": 6249,
+    "items": [
+        {
+            "id": 340780,
+            "type": "city",
+            "url": "/api.list/city/340780/",
+            "country": 165872,
+            "district": 165878,
+            "name": "Žižice"
+        }
+        // repeat
+    ]
+}
+
+Detail mesta<br>
+Access: R<br>
+Status: draft
+GET /api.list/city/340780/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "id": 340780,
+    "type": "city",
+    "url": "/api.list/city/340780/",
+    "country": 165872,
+    "district": 165878,
+    "name": "Žižice"
+}
 
 -- User / Fan --
 Vypise data uzivatele publicid<br>
@@ -504,7 +640,7 @@ GET /api.fan-list/
     "totalPages": 6,
     "page": 1,
     "pageSize": 10,
-    "filters": {    // NIY
+    "filters": {
         "q": null,  // fulltext query
         "ageMin": null,
         "ageMax": null,
@@ -1503,6 +1639,7 @@ PUT /api.confirm/2aln0oGGX8VrMkxmA9cqjGsV5u0iGoet/
 }
 
 -- Upload souborů --
+
 Uploaduje se na jednotnou API url /api.upload/, která vrací id (a další metadata) vytvořeného souboru. Toto id/url se
 použije při dalších volání API, kde je třeba uploadovaný soubor (registrace atp.). Api povoluje
 najednout uploadovat jeden soubor, na názvu nezáleží.
