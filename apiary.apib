@@ -26,6 +26,10 @@ TODO
 
 Changelog
 --
+2013-01-11<br>
+- Doc fixes: odstraněny TODOs, kde už žádné nejsou<br>
+- Upraven request registrace (odstranění confirmLinkMask), popis procesu registrace bude detailně popsán po spuštění
+
 2013-01-04<br>
 - Přidáno URL /api.file-upload/ - upload souborů<br>
 
@@ -1265,15 +1269,15 @@ GET /api.gig/id/attendee-list/?page=1
 
 Pridani fanouska na attendee-list akce
 Access: S<br>
-Status: online+TODO
-POST /api.gig/id/attendee-list/?page=1
+Status: online
+POST /api.gig/id/attendee-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
 > User-Token: 5cc3944e93fdf326886c8a225d59aa2e460954fc
 > Content-Type: application/json
 {
     "id": 13222,  // id fanouska, ktereho chceme pridat na attendee-list (musi se shodovat s prihlasenym)
-    "type": "C"   // TODO: "C" = pridat do kalendare (neverejny attending), "A" nebo not set = jdu (verejny attending)
+    "type": "C"   // "C" = pridat do kalendare (neverejny attending), "A" nebo not set = jdu (verejny attending)
 }
 < 201
 < Content-Type: application/json
@@ -1591,8 +1595,6 @@ POST /api.register/
     "password": "heslo",    // heslo, alespoň 5 znaků
     "email": "platny@email.tld",    // platný e-mail, na jednu adresu může být u nás jen jeden účet
     "name": "Franta Vomáčka", // jméno, pod kterým se bude user zobrazovat
-    "confirmLinkMask": "http://server.nekde/potvrdit.html?{code}",   // maska potvrzovacího odkazu, který bude zaslán na zadaný mail, {code} bude nahrazeno kódem, kterým je nutno potvrdit e-mailovou adresu
-    //TODO: je to pro vas takhle OK? Druha moznost je poslat link k nam na web a objednat si tady redirect, ktery se zavola po uspesnem potvrzeni
     "dob": "1983-02-24", // datum narození, volitelné
     "city": "Praha"     // TODO: u nás nastavujeme z číselníku
 }
