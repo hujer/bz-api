@@ -26,10 +26,13 @@ TODO
 
 Changelog
 --
+2013-01-14<br>
+- Notifications draft fix: post na cilovou URL obsahuje cely objekt fanouska misto API url + zminka o tom, ze se nastaveni prepisuje
+- Notifications draft update: pridan GET pro dotaz na aktualni stav notifikaci
+
 2013-01-11<br>
 - Doc fixes: odstraněny TODOs, kde už žádné nejsou<br>
-- Upraven request registrace (odstranění confirmLinkMask), popis procesu registrace bude detailně popsán po spuštění
-- Draft /api.account/
+- Upraven request registrace (odstranění confirmLinkMask), odstraněn confirm call, proces registrace bude detailně popsán po spuštění
 
 2013-01-04<br>
 - Přidáno URL /api.file-upload/ - upload souborů<br>
@@ -476,7 +479,7 @@ PUT /api.fan/publicid/profile-image
         "x": 10,
         "y": 20,
         "w": 40,
-        "h": 40   
+        "h": 40
     }
 }
 < 200
@@ -766,16 +769,33 @@ GET /api.fan/publicid/attending-list/
 }
 
 
+Zjisteni stavu odberu<br>
+Access: S<br>
+Status: draft<br>
+Pokud fanousek nema zadne notifikace, vrati se 204 No Content<br>
+Pokud jsou notifikace zapnute, vrati se aktualne nastavena url a content-type
+GET /api.fan/publicid/notify/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> User-Token: 5cc3944e93fdf326886c8a225d59aa2e460954fc
+< 200
+< Content-Type: application/json
+{
+    "url": "http://example.com/notify.url/",
+    "content-type": "application/x-www-form-urlencoded"
+}
+
 Prihlaseni se k odberu notifikaci fanousk publicid<br>
 Access: S<br>
 Status: draft<br>
 Prihlaseni se k notifikacim je mozne provest jen pokud je prihlasenu fanousek a pouze na jeho ucet.<br>
+Pokud ma fanousek jiz urcene URL pro zasilani notifikaci, puvodni nastaveni se tise prepise novym.<br>
 Zadana URL bude zavolana nasim serverem (POST), kdyz fanouskovi prijde notifikace. URL NESMI presmerovavat.<br>
 Pokud dostaneme navratovy kod 200, povazujeme zpravu za prijatou. Pokud dostaneme 4xx, notifikaci znovu posilat nebudeme.<br>
 Pokud dostaneme 5xx, pokusime se nekolikrat se zvysujicim se odstupem zpravu odeslat znova.<br>
 Zaslana zprava bude obsahovat pole:<br>
 - message: text zpravy<br>
-- url: API url fanouska, pro ktereho je notifikace urcena<br>
+- fan: objekt fanouska (reponse keys jako /api.fan/publicid/), pro ktereho je notifikace urcena
 Encodovani dat je mozno si zvolit, budto application/x-www-form-urlencoded (default) nebo application/json
 POST /api.fan/publicid/notify/
 > Client-Id: example
@@ -1773,30 +1793,6 @@ POST /api.register/
     "cityId": 1234     // z číselníku
 }
 < 201
-< Content-Type: application/json
-{
-    "id": 753276,
-    "type": "fan",
-    "url": "/api.fan/username", // API URL
-    "name": "Franta Vomáčka",   // nick
-    "webUrl": "http://bandzone.cz/fan/publicid",
-    "gender": "M",  // M, F, null
-    "age": 29,    // or null
-    "city": "Praha",    // or null
-    "image": {
-        "small": {
-            "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/goqoA11r0iIH29LnA_dBQg6ohtIULMYt.jpg"
-        }
-    }
-}
-
-Potvrzení e-mailu<br>
-Access: W<br>
-Status: draft
-PUT /api.confirm/2aln0oGGX8VrMkxmA9cqjGsV5u0iGoet/
-> Client-Id: example
-> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
-< 200
 < Content-Type: application/json
 {
     "id": 753276,
