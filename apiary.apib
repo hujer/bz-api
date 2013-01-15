@@ -26,10 +26,12 @@ TODO
 
 Changelog
 --
+2013-01-15<br>
+- Online /api.register/, uprava fan profilu / profiloveho obrazku na /api.fan/publicId, a /api.fan/publicId/profile-image/
+
 2013-01-11<br>
 - Doc fixes: odstraněny TODOs, kde už žádné nejsou<br>
 - Upraven request registrace (odstranění confirmLinkMask), popis procesu registrace bude detailně popsán po spuštění
-- Draft /api.account/
 
 2013-01-04<br>
 - Přidáno URL /api.file-upload/ - upload souborů<br>
@@ -326,7 +328,7 @@ GET /api.fan/publicid/
 
 Updatuje profilové údaje uživatele (datum narození, jméno, město, pohlaví)<br>
 Access: S<br>
-Status: draft
+Status: online
 PUT /api.fan/publicid/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -351,88 +353,8 @@ PUT /api.fan/publicid/
     "city": "Praha",    // or null
     "friend": true,     // pouze pokud je prihlaseny uzivatel
     "mutual": false,    // -- " --
-    "image": {
-        "small": {  // ctvercovy vyrez 58x58px
-            "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/goqoA11r0iIH29LnA_dBQg6ohtIULMYt.jpg"
-        },
-        "profile": {    // format 250x<y>px
-            "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/K6Yr0dio1PfeoFi7bsn4IyQ1cBiz8Y3o.jpg"
-        },
-        "full": {   // plna velikost
-            "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/X8Gms_QpMd2vlNu6IzieYac-IDkBaUha.jpg"
-        }
-    },
-    "favoriteBandList": {   // list 5 polozek automaticky
-        "url": "/api.fan/publicid/favorite-band-list/",
-        "total": 86,
-        "items": [
-            {
-                "id": 1040,
-                "type": "band",
-                "url": "/api.band/kombucha/",
-                "webUrl": "http://bandzone.cz/kombucha",
-                "name": "Kombucha",
-                "genre": "aggro-psychedelic",
-                "city": "Praha",
-                "image": {
-                    "small": {
-                        "url": "http://usr.bandzone.cz/band/ko/kombucha/gallery/profile.default/384269_t_s.jpg"
-                    }
-                }
-            },
-            {
-                "id": 2196,
-                "type": "band",
-                "url": "/api.band/ahumadogranujo/",
-                "webUrl": "http://bandzone.cz/ahumadogranujo",
-                "name": "Ahumado Granujo",
-                "genre": "grind-dance music",
-                "city": "Praha",
-                "image": {
-                    "small": {
-                        "url": "http://usr.bandzone.cz/band/ah/ahumadogranujo/gallery/profile.default/x4n0jvF8qnazQiI1L8Nv4BNG-7HOc2fL.jpg"
-                    }
-                }
-            }
-        ]
-    },
-    "friendList": {
-        "url": "/api.fan/publicid/friend-list/",
-        "total": 54,
-        "items": [
-            {
-                "id": 13290,
-                "type": "fan",
-                "url": "/api.fan/trta/",
-                "webUrl": "http://bandzone.cz/fan/trta",
-                "name": "ʕ •ᴥ•ʔ křupavoučká jitrnice",
-                "gender": "F",
-                "age": 30,
-                "city": "Nýmand berk",
-                "mutual": true, // pouze pri session, mutual friendship?
-                "image": {
-                    "small": {
-                        "url": "http://usr.bandzone.cz/fan/tr/trta/gallery/profile.default/GfCcQir0ZKMjkjZhN1vGvSxXaaym0P8H.jpg"
-                    }
-                }
-            },
-            {
-                "id": 13189,
-                "type": "fan",
-                "url": "/api.fan/majklac/",
-                "webUrl": "http://bandzone.cz/fan/majklac",
-                "name": "Majkláč",
-                "gender": "M",
-                "age": 33,
-                "city": "Praha",
-                "mutual": false, // pouze pri session, mutual friendship?
-                "image": {
-                    "small": {
-                        "url": "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/dT9BOUxUeJ9mBLLT3G-0mLE3fX6KWyyf.jpg"
-                    }
-                }
-            }
-        ]
+    "image": null,
+    "favoriteBandList": []
     }
 }
 
@@ -440,7 +362,7 @@ PUT /api.fan/publicid/
 
 Vrací informace o profilovém obrázku uživatele<br>
 Access: R<br>
-Status: draft
+Status: online
 GET /api.fan/publicid/profile-image
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -462,16 +384,16 @@ GET /api.fan/publicid/profile-image
 
 
 Updatuje profilový obrázek uživatele<br>
-V případě, že nahraný soubor není validní obrázek, nejsou správně zadány parametry nebo je zadán chybný výřez, vrací se 400 s popisem chyby
+V případě, že nahraný soubor není validní obrázek, nejsou správně zadány parametry nebo je zadán chybný výřez, vrací se 400 s popisem chyby<br>
 Access: S<br>
-Status: draft
+Status: online
 PUT /api.fan/publicid/profile-image
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
 > User-Token: 5cc3944e93fdf326886c8a225d59aa2e460954fc
 > Content-Type: application/json
 {
-    "upload": "/api.upload/ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c", // Ziskane postem na /api.upload/
+    "uploadId": "ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c", // Ziskane postem na /api.upload/
     "crop": { // Pokud je zadan param. crop, musi byt x,y,w,h take zadany, w a h musi byt v tomto pripade stejne, profilovy obrazek je ctverec
         "x": 10,
         "y": 20,
@@ -1759,7 +1681,7 @@ DELETE /api.session/03487c7b2673a260f68537d65f5b9d0e64864302/
 
 Vytvoření účtu<br>
 Access: W<br>
-Status: draft+TODO
+Status: online+TODO
 POST /api.register/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1775,18 +1697,98 @@ POST /api.register/
 < 201
 < Content-Type: application/json
 {
-    "id": 753276,
+    "id": 13190,
     "type": "fan",
-    "url": "/api.fan/username", // API URL
-    "name": "Franta Vomáčka",   // nick
-    "webUrl": "http://bandzone.cz/fan/publicid",
+    "url": "/api.fan/publicid/", // API URL
+    "webUrl": "http://bandzone.cz/fan/publicid",    // web URL
+    "name": "User Name",    // jmeno = nick
     "gender": "M",  // M, F, null
     "age": 29,    // or null
     "city": "Praha",    // or null
+    "friend": true,     // pouze pokud je prihlaseny uzivatel
+    "mutual": false,    // -- " --
     "image": {
-        "small": {
+        "small": {  // ctvercovy vyrez 58x58px
             "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/goqoA11r0iIH29LnA_dBQg6ohtIULMYt.jpg"
+        },
+        "profile": {    // format 250x<y>px
+            "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/K6Yr0dio1PfeoFi7bsn4IyQ1cBiz8Y3o.jpg"
+        },
+        "full": {   // plna velikost
+            "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/X8Gms_QpMd2vlNu6IzieYac-IDkBaUha.jpg"
         }
+    },
+    "favoriteBandList": {   // list 5 polozek automaticky
+        "url": "/api.fan/publicid/favorite-band-list/",
+        "total": 86,
+        "items": [
+            {
+                "id": 1040,
+                "type": "band",
+                "url": "/api.band/kombucha/",
+                "webUrl": "http://bandzone.cz/kombucha",
+                "name": "Kombucha",
+                "genre": "aggro-psychedelic",
+                "city": "Praha",
+                "image": {
+                    "small": {
+                        "url": "http://usr.bandzone.cz/band/ko/kombucha/gallery/profile.default/384269_t_s.jpg"
+                    }
+                }
+            },
+            {
+                "id": 2196,
+                "type": "band",
+                "url": "/api.band/ahumadogranujo/",
+                "webUrl": "http://bandzone.cz/ahumadogranujo",
+                "name": "Ahumado Granujo",
+                "genre": "grind-dance music",
+                "city": "Praha",
+                "image": {
+                    "small": {
+                        "url": "http://usr.bandzone.cz/band/ah/ahumadogranujo/gallery/profile.default/x4n0jvF8qnazQiI1L8Nv4BNG-7HOc2fL.jpg"
+                    }
+                }
+            }
+        ]
+    },
+    "friendList": {
+        "url": "/api.fan/publicid/friend-list/",
+        "total": 54,
+        "items": [
+            {
+                "id": 13290,
+                "type": "fan",
+                "url": "/api.fan/trta/",
+                "webUrl": "http://bandzone.cz/fan/trta",
+                "name": "ʕ •ᴥ•ʔ křupavoučká jitrnice",
+                "gender": "F",
+                "age": 30,
+                "city": "Nýmand berk",
+                "mutual": true, // pouze pri session, mutual friendship?
+                "image": {
+                    "small": {
+                        "url": "http://usr.bandzone.cz/fan/tr/trta/gallery/profile.default/GfCcQir0ZKMjkjZhN1vGvSxXaaym0P8H.jpg"
+                    }
+                }
+            },
+            {
+                "id": 13189,
+                "type": "fan",
+                "url": "/api.fan/majklac/",
+                "webUrl": "http://bandzone.cz/fan/majklac",
+                "name": "Majkláč",
+                "gender": "M",
+                "age": 33,
+                "city": "Praha",
+                "mutual": false, // pouze pri session, mutual friendship?
+                "image": {
+                    "small": {
+                        "url": "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/dT9BOUxUeJ9mBLLT3G-0mLE3fX6KWyyf.jpg"
+                    }
+                }
+            }
+        ]
     }
 }
 
