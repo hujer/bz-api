@@ -27,7 +27,8 @@ TODO
 Changelog
 --
 2013-01-15<br>
-- Online /api.register/, uprava fan profilu / profiloveho obrazku na /api.fan/publicId, a /api.fan/publicId/profile-image/
+- Online /api.register/, uprava fan profilu / profiloveho obrazku na /api.fan/publicId, a /api.fan/publicId/profile-image/<br>
+- Online /api.fan/publicid/notify/ - subskripce k notifikacím, notifikace samotné však ještě nefungují (na bandzone.cz)<br>
 
 2013-01-14<br>
 - Notifications draft fix: post na cilovou URL obsahuje cely objekt fanouska misto API url + zminka o tom, ze se nastaveni prepisuje<br>
@@ -694,7 +695,7 @@ GET /api.fan/publicid/attending-list/
 
 Zjisteni stavu odberu<br>
 Access: S<br>
-Status: draft<br>
+Status: online<br>
 Pokud fanousek nema zadne notifikace, vrati se 204 No Content<br>
 Pokud jsou notifikace zapnute, vrati se aktualne nastavena url a content-type
 GET /api.fan/publicid/notify/
@@ -710,7 +711,7 @@ GET /api.fan/publicid/notify/
 
 Prihlaseni se k odberu notifikaci fanousk publicid<br>
 Access: S<br>
-Status: draft<br>
+Status: online<br>
 Prihlaseni se k notifikacim je mozne provest jen pokud je prihlasenu fanousek a pouze na jeho ucet.<br>
 Pokud ma fanousek jiz urcene URL pro zasilani notifikaci, puvodni nastaveni se tise prepise novym.<br>
 Zadana URL bude zavolana nasim serverem (POST), kdyz fanouskovi prijde notifikace. URL NESMI presmerovavat.<br>
@@ -737,7 +738,7 @@ POST /api.fan/publicid/notify/
 
 Zruseni odberu notifikaci u fanouska publicid<br>
 Access: W<br>
-Status: draft
+Status: obline
 DELETE /api.fan/publicid/notify/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1729,86 +1730,17 @@ POST /api.register/
     "friend": true,     // pouze pokud je prihlaseny uzivatel
     "mutual": false,    // -- " --
     "image": {
-        "small": {  // ctvercovy vyrez 58x58px
-            "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/goqoA11r0iIH29LnA_dBQg6ohtIULMYt.jpg"
-        },
-        "profile": {    // format 250x<y>px
-            "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/K6Yr0dio1PfeoFi7bsn4IyQ1cBiz8Y3o.jpg"
-        },
-        "full": {   // plna velikost
-            "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/X8Gms_QpMd2vlNu6IzieYac-IDkBaUha.jpg"
-        }
     },
     "favoriteBandList": {   // list 5 polozek automaticky
         "url": "/api.fan/publicid/favorite-band-list/",
-        "total": 86,
+        "total": 0,
         "items": [
-            {
-                "id": 1040,
-                "type": "band",
-                "url": "/api.band/kombucha/",
-                "webUrl": "http://bandzone.cz/kombucha",
-                "name": "Kombucha",
-                "genre": "aggro-psychedelic",
-                "city": "Praha",
-                "image": {
-                    "small": {
-                        "url": "http://usr.bandzone.cz/band/ko/kombucha/gallery/profile.default/384269_t_s.jpg"
-                    }
-                }
-            },
-            {
-                "id": 2196,
-                "type": "band",
-                "url": "/api.band/ahumadogranujo/",
-                "webUrl": "http://bandzone.cz/ahumadogranujo",
-                "name": "Ahumado Granujo",
-                "genre": "grind-dance music",
-                "city": "Praha",
-                "image": {
-                    "small": {
-                        "url": "http://usr.bandzone.cz/band/ah/ahumadogranujo/gallery/profile.default/x4n0jvF8qnazQiI1L8Nv4BNG-7HOc2fL.jpg"
-                    }
-                }
-            }
         ]
     },
     "friendList": {
         "url": "/api.fan/publicid/friend-list/",
-        "total": 54,
+        "total": 0,
         "items": [
-            {
-                "id": 13290,
-                "type": "fan",
-                "url": "/api.fan/trta/",
-                "webUrl": "http://bandzone.cz/fan/trta",
-                "name": "ʕ •ᴥ•ʔ křupavoučká jitrnice",
-                "gender": "F",
-                "age": 30,
-                "city": "Nýmand berk",
-                "mutual": true, // pouze pri session, mutual friendship?
-                "image": {
-                    "small": {
-                        "url": "http://usr.bandzone.cz/fan/tr/trta/gallery/profile.default/GfCcQir0ZKMjkjZhN1vGvSxXaaym0P8H.jpg"
-                    }
-                }
-            },
-            {
-                "id": 13189,
-                "type": "fan",
-                "url": "/api.fan/majklac/",
-                "webUrl": "http://bandzone.cz/fan/majklac",
-                "name": "Majkláč",
-                "gender": "M",
-                "age": 33,
-                "city": "Praha",
-                "mutual": false, // pouze pri session, mutual friendship?
-                "image": {
-                    "small": {
-                        "url": "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/dT9BOUxUeJ9mBLLT3G-0mLE3fX6KWyyf.jpg"
-                    }
-                }
-            }
         ]
     }
 }
