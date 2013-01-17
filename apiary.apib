@@ -19,6 +19,24 @@ Write access
 Všechny zapisující requesty musí být s nastavenými headery Client-Id a Client-Key.<br>
 Data je možné posílat jako application/x-www-form-urlencoded, multipart/form-data nebo application/json. Příklady jsou většinou uvedeny v JSON kvůli čitelnosti.
 
+Postup registrace fanouška
+--
+Registrace probíha post requestem na /api.register/, je požadován write access (správné Client-Id a Client-Key hlavičky). 
+Api přijímá následující parametry:
+<pre>
+{
+    "login": "username",    // nepovinné, pokud nezadáno, vygeneruje se login z parametru <strong>name<strong> a <strong>email</strong>
+    "password": "heslo",    // heslo, alespoň 5 znaků
+    "email": "platny@email.tld",    // platný e-mail, na jednu adresu může být u nás jen jeden účet
+    "name": "Franta Vomáčka", // jméno, pod kterým se bude user zobrazovat
+    "dob": "1983-02-24", // nepovinné
+    "cityId": 1234     // id města z číselníku viz <strong>/api.list/city/</strong>
+}
+</pre>
+Po úspěšné registraci je fanoušek na webu bandzone.cz neaktivní (na registrační email je zaslán potvrzovací e-mail), pomocí API však může dělat všechny akce jako aktivní fanoušek.<br>
+Profilovou fotku je možné měnit pomocí put requestu na /api.fan/publicId/profile-image/
+
+
 Error responses
 --
 TODO
@@ -26,6 +44,9 @@ TODO
 
 Changelog
 --
+2013-01-16<br>
+- Postup registrace fanouška.
+
 2013-01-16<br>
 - Změna obrázky: nyní je pole obrázků vždy naplněno URL default obrázků, pokud objekt (koncert, fan, kapela) žádný uživatelský nemá. Toto je indikováno klíčem "default": true vedle obrázků.
 
@@ -99,7 +120,7 @@ Changelog
 -- Číselníky --
 Vypise seznam zemi<br>
 Access: R<br>
-Status: draft
+Status: online
 GET /api.list/country/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -125,7 +146,7 @@ GET /api.list/country/
 
 Detail země<br>
 Access: R<br>
-Status: draft
+Status: online
 GET /api.list/country/165872/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -141,7 +162,7 @@ GET /api.list/country/165872/
 
 Vypise seznam kraju (CZ a SK)<br>
 Access: R<br>
-Status: draft
+Status: online
 GET /api.list/district/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -168,7 +189,7 @@ GET /api.list/district/
 
 Detail kraje<br>
 Access: R<br>
-Status: draft
+Status: online
 GET /api.list/district/165873/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -184,7 +205,7 @@ GET /api.list/district/165873/
 
 Vypise seznam mest (CZ a SK)<br>
 Access: R<br>
-Status: draft
+Status: online
 GET /api.list/city/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -213,7 +234,7 @@ GET /api.list/city/
 
 Detail mesta<br>
 Access: R<br>
-Status: draft
+Status: online
 GET /api.list/city/340780/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -403,7 +424,7 @@ PUT /api.fan/publicid/profile-image
 {
     "uploadId": "ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c", // Ziskane postem na /api.upload/
     "crop": { // Pokud je zadan param. crop, musi byt x,y,w,h take zadany, w a h musi byt v tomto pripade stejne, profilovy obrazek je ctverec
-        "x": 10,
+        "x": 10, 
         "y": 20,
         "w": 40,
         "h": 40
