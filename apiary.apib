@@ -41,14 +41,18 @@ Error responses
 --
 TODO
 
-
-Changelog
 --
-2013-01-16<br>
-- Postup registrace fanouška.
+Changelog
+
+2013-01-28<br>
+- Alba: duplicitní klíč "type" přejmenován na správný "media" (requesty ho takhle vracely už dříve)<br>
+- Alba: přidány default images<br>
 
 2013-01-16<br>
-- Změna obrázky: nyní je pole obrázků vždy naplněno URL default obrázků, pokud objekt (koncert, fan, kapela) žádný uživatelský nemá. Toto je indikováno klíčem "default": true vedle obrázků.
+- Postup registrace fanouška.<br>
+
+2013-01-16<br>
+- Změna obrázky: nyní je pole obrázků vždy naplněno URL default obrázků, pokud objekt (koncert, fan, kapela) žádný uživatelský nemá. Toto je indikováno klíčem "default": true vedle obrázků.<br>
 
 2013-01-15<br>
 - Online /api.register/, uprava fan profilu / profiloveho obrazku na /api.fan/publicId, a /api.fan/publicId/profile-image/<br>
@@ -892,7 +896,7 @@ GET /api.band/publicid/
                     }
                 },
                 "tracks": 5,
-                "type": "cd",   // "cd", "dvd", "vynil", "digital", "mc", "other"
+                "media": "cd",   // "cd", "dvd", "vinyl", "digital", "mc", "other"
                 "released": "2010"  // year or full date YYYY-MM-DD
             },
             {
@@ -906,7 +910,7 @@ GET /api.band/publicid/
                     }
                 },
                 "tracks": 12,
-                "type": "cd",
+                "media": "cd",   // "cd", "dvd", "vinyl", "digital", "mc", "other"
                 "released": "2012-03-21"
             }
         ]
@@ -1013,7 +1017,7 @@ GET /api.band/publicid/album-list/
                 }
             },
             "tracks": 5,
-            "type": "cd",   // "cd", "dvd", "vynil", "digital", "mc", "other"
+            "media": "cd",   // "cd", "dvd", "vinyl", "digital", "mc", "other"
             "released": "2010",  // year or full date YYYY-MM-DD
             //TODO: additional info, producent atd.
         },
@@ -1031,7 +1035,7 @@ GET /api.band/publicid/album-list/
                 }
             },
             "tracks": 12,
-            "type": "cd",
+            "media": "cd",
             "released": "2012-03-21",
             //TODO: additional info
         }
@@ -1060,7 +1064,7 @@ GET /api.band/publicid/album/56561/
         }
     },
     "tracks": 12,
-    "type": "cd",
+    "media": "cd",  // "cd", "dvd", "vinyl", "digital", "mc", "other"
     "released": "2012-03-21",
     //TODO: additional info
 }
