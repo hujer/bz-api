@@ -44,6 +44,9 @@ TODO
 --
 Changelog
 
+2013-01-29<br>
+- Doc fix: opraveny api.upload/ requesty na spravny api.file-upload/<br>
+
 2013-01-28<br>
 - Alba: duplicitní klíč "type" přejmenován na správný "media" (requesty ho takhle vracely už dříve)<br>
 - Alba: přidány default images<br>
@@ -1776,7 +1779,7 @@ POST /api.register/
 
 -- Upload souborů --
 
-Uploaduje se na jednotnou API url /api.upload/, která vrací id (a další metadata) vytvořeného souboru. Toto id/url se
+Uploaduje se na jednotnou API url /api.file-upload/, která vrací id (a další metadata) vytvořeného souboru. Toto id/url se
 použije při dalších volání API, kde je třeba uploadovaný soubor (registrace atp.). Api povoluje
 najednout uploadovat jeden soubor, na názvu nezáleží.
 
@@ -1785,7 +1788,7 @@ najednout uploadovat jeden soubor, na názvu nezáleží.
 Upload souboru<br>
 Access: W<br>
 Status: online
-POST /api.upload/
+POST /api.file-upload/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
 > Content-Type: multipart/form-data
@@ -1805,7 +1808,7 @@ POST /api.upload/
 Mazání uploadovaného souboru<br>
 Access: W<br>
 Status: online
-DELETE /api.upload/ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c
+DELETE /api.file-upload/ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
 < 200
@@ -1818,7 +1821,7 @@ DELETE /api.upload/ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c
 Získání informací o uploadovaném souboru<br>
 Access: W<br>
 Status: online
-GET /api.upload/ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c
+GET /api.file-upload/ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
 < 200
