@@ -22,7 +22,7 @@ Uploady je nutné posílat jako multipart/form-data.
 
 Postup registrace fanouška
 --
-Registrace probíha post requestem na /api.register/, je požadován write access (správné Client-Id a Client-Key hlavičky). 
+Registrace probíhá POST requestem na /api.register/, je požadován write access (správné Client-Id a Client-Key hlavičky). 
 Api přijímá následující parametry:
 <pre>
 {
@@ -37,6 +37,10 @@ Api přijímá následující parametry:
 Po úspěšné registraci je fanoušek na webu bandzone.cz neaktivní (na registrační email je zaslán potvrzovací e-mail), pomocí API však může dělat všechny akce jako aktivní fanoušek.<br>
 Profilovou fotku je možné měnit pomocí put requestu na /api.fan/publicId/profile-image/
 
+Facebook registrace fanouška (draft)
+--
+Registrace probíhá POST requestem na /api.fb-register/, potřebujeme facebookové user Id a access token. Server si zavolá facebook API a vyžádá si zbytek informací. Access token musí mít povoleno získat e-mail, pokud ho FB API nevrátí, nastane chyba.
+
 
 Error responses
 --
@@ -44,6 +48,9 @@ TODO
 
 --
 Changelog
+
+2013-01-31<br>
+- Facebook registrace + login draft<br>
 
 2013-01-30<br>
 - Update: uploady jsou nyní Access: S<br>
@@ -1699,6 +1706,40 @@ login=username&password=hesloneasi
     }
 }
 
+Přihlášení facebook uživatele, získání user tokenu<br>
+201 v případě správných údajů<br>
+Access: W<br>
+Status: draft
+POST /api.fb-session/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> Content-Type: application/json
+{
+    "userId": "629018629",    // FB id uživatele
+    "accessToken": "AAABrOKqhkPgBAJvJGrSYh7zU2lNNE5iYD7IKL7T6Cm3sZAbp4QZA6MWPDwRJvdZAW1e513bssIuNxwJJ9gNasrxKLh78jda04aK4gYB8QZDZD",    // FB access token
+}
+< 201
+< Content-Type: application/json
+{
+    "url": "/api.session/03487c7b2673a260f68537d65f5b9d0e64864302/", // tady lze ziskat informace o session
+    "user-token": "03487c7b2673a260f68537d65f5b9d0e64864302",
+    "user": {
+        "id": 666,
+        "type": "fan",
+        "url": "/api.fan/publicid", // API URL
+        "name": "Franta Vomáčka",   // nick
+        "webUrl": "http://bandzone.cz/fan/publicid",
+        "gender": "M",  // M, F, null
+        "age": 29,    // or null
+        "city": "Praha",    // or null
+        "image": {
+            "small": {
+                "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/goqoA11r0iIH29LnA_dBQg6ohtIULMYt.jpg"
+            }
+        }
+    }
+}
+
 Získání informací o přihlášeném uživateli<br>
 Access: S<br>
 Status: online
@@ -1741,7 +1782,7 @@ DELETE /api.session/03487c7b2673a260f68537d65f5b9d0e64864302/
 
 Vytvoření účtu<br>
 Access: W<br>
-Status: online+TODO
+Status: online
 POST /api.register/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1753,6 +1794,48 @@ POST /api.register/
     "name": "Franta Vomáčka", // jméno, pod kterým se bude user zobrazovat
     "dob": "1983-02-24", // datum narození, volitelné
     "cityId": 1234     // z číselníku
+}
+< 201
+< Content-Type: application/json
+{
+    "id": 13190,
+    "type": "fan",
+    "url": "/api.fan/publicid/", // API URL
+    "webUrl": "http://bandzone.cz/fan/publicid",    // web URL
+    "name": "User Name",    // jmeno = nick
+    "gender": "M",  // M, F, null
+    "age": 29,    // or null
+    "city": "Praha",    // or null
+    "friend": true,     // pouze pokud je prihlaseny uzivatel
+    "mutual": false,    // -- " --
+    "image": {
+    },
+    "favoriteBandList": {   // list 5 polozek automaticky
+        "url": "/api.fan/publicid/favorite-band-list/",
+        "total": 0,
+        "items": [
+        ]
+    },
+    "friendList": {
+        "url": "/api.fan/publicid/friend-list/",
+        "total": 0,
+        "items": [
+        ]
+    }
+}
+
+-- Registrace facebook uživatele --
+
+Vytvoření účtu<br>
+Access: W<br>
+Status: draft
+POST /api.fb-register/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> Content-Type: application/json
+{
+    "userId": "629018629",    // FB id uživatele
+    "accessToken": "AAABrOKqhkPgBAJvJGrSYh7zU2lNNE5iYD7IKL7T6Cm3sZAbp4QZA6MWPDwRJvdZAW1e513bssIuNxwJJ9gNasrxKLh78jda04aK4gYB8QZDZD",    // FB access token
 }
 < 201
 < Content-Type: application/json
