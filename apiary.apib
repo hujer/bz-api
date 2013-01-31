@@ -17,7 +17,8 @@ Strankovani ovlada parametr page, zaciname od jedne do totalPages.
 Write access
 --
 Všechny zapisující requesty musí být s nastavenými headery Client-Id a Client-Key.<br>
-Data je možné posílat jako application/x-www-form-urlencoded, multipart/form-data nebo application/json. Příklady jsou většinou uvedeny v JSON kvůli čitelnosti.
+Data je možné posílat jako application/x-www-form-urlencoded, multipart/form-data nebo application/json. Příklady jsou většinou uvedeny v application/json kvůli čitelnosti.<br>
+Uploady je nutné posílat jako multipart/form-data.
 
 Postup registrace fanouška
 --
@@ -43,6 +44,9 @@ TODO
 
 --
 Changelog
+
+2013-01-30<br>
+- Update: uploady jsou nyní Access: S<br>
 
 2013-01-29<br>
 - Doc fix: opraveny api.upload/ requesty na spravny api.file-upload/<br>
@@ -1483,7 +1487,7 @@ GET /api.gig-list/
     "totalPages": 400,
     "page": 0,
     "pageSize": 10,
-    "filters": {    // NIY
+    "filters": {
         "q": null,  // fulltext query
         "startDate": null,  // YYYY-MM-DD
         "endDate": null,    // YYYY-MM-DD
@@ -1635,7 +1639,7 @@ GET /api.venue-list/?q=fleda
     "totalPages": 1,
     "page": 1,
     "pageSize": 10,
-    "filters": {    // NIY
+    "filters": {
         "q": "fleda",  // fulltext query
         "lat": null,    // not currently supported
         "long": null,
@@ -1701,6 +1705,7 @@ Status: online
 GET /api.session/03487c7b2673a260f68537d65f5b9d0e64864302/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> User-Token: 5cc3944e93fdf326886c8a225d59aa2e460954fc
 < 200
 < Content-Type: application/json
 {
@@ -1725,6 +1730,7 @@ Status: online
 DELETE /api.session/03487c7b2673a260f68537d65f5b9d0e64864302/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> User-Token: 5cc3944e93fdf326886c8a225d59aa2e460954fc
 < 200
 < Content-Type: application/json
 {
@@ -1782,15 +1788,17 @@ POST /api.register/
 Uploaduje se na jednotnou API url /api.file-upload/, která vrací id (a další metadata) vytvořeného souboru. Toto id/url se
 použije při dalších volání API, kde je třeba uploadovaný soubor (registrace atp.). Api povoluje
 najednout uploadovat jeden soubor, na názvu nezáleží.
+Soubor je uploadován pro kombinaci klient + uživatel, uživatelé a klienti tedy na svoje soubory navzájem nevidí.
 
 --
 
 Upload souboru<br>
-Access: W<br>
+Access: S<br>
 Status: online
 POST /api.file-upload/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> User-Token: 5cc3944e93fdf326886c8a225d59aa2e460954fc
 > Content-Type: multipart/form-data
 > Content-Length: 65342
 < 201
@@ -1806,11 +1814,12 @@ POST /api.file-upload/
 
 
 Mazání uploadovaného souboru<br>
-Access: W<br>
+Access: S<br>
 Status: online
 DELETE /api.file-upload/ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> User-Token: 5cc3944e93fdf326886c8a225d59aa2e460954fc
 < 200
 < Content-Type: application/json
 {
@@ -1819,11 +1828,12 @@ DELETE /api.file-upload/ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c/
 
 
 Získání informací o uploadovaném souboru<br>
-Access: W<br>
+Access: S<br>
 Status: online
 GET /api.file-upload/ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> User-Token: 5cc3944e93fdf326886c8a225d59aa2e460954fc
 < 200
 < Content-Type: application/json
 {
