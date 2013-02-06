@@ -9,6 +9,7 @@ Pro prihlasovani a dalsi funkce je nutno mit platnou kombinaci Client-Id a Clien
 Po prihlaseni je pro identifikaci uzivatele nutno posilat dalsi header User-Token - id aktivni session.<br>
 Pokud je aktivni session, lze misto publicid uzivatele pouzit specialni "_me", ktere znamena "prave prihlaseny user".<br>
 Access levels: R - read (public), W - write (Client-Id + Client-Key), S - session (lze pouzit jen pokud je prihlaseny user, Client-Id + Client-Key + User-Token)
+Permissions: public, client, userLogin, userRegistration, playTracks, uploadFiles, notifications, venueExclusive
 
 Strankovani vypisu
 --
@@ -37,7 +38,7 @@ Api přijímá následující parametry:
 Po úspěšné registraci je fanoušek na webu bandzone.cz neaktivní (na registrační email je zaslán potvrzovací e-mail), pomocí API však může dělat všechny akce jako aktivní fanoušek.<br>
 Profilovou fotku je možné měnit pomocí put requestu na /api.fan/publicId/profile-image/
 
-Facebook registrace fanouška (draft)
+Facebook registrace fanouška
 --
 Registrace probíhá POST requestem na /api.fb-register/, potřebujeme facebookové user Id a access token. Server si zavolá facebook API a vyžádá si zbytek informací. Access token musí mít povoleno získat e-mail, pokud ho FB API nevrátí, nastane chyba.
 
@@ -48,6 +49,11 @@ TODO
 
 --
 Changelog
+
+2013-02-06<br>
+- Facebook registrace + login online<br>
+- Zpřísnění přístupu k některým requestům, klient musí mít správné permissions (je tedy nutné klienta identifikovat pomocí Client-Id a Client-Key), indikováno Permissions: zde v dokumentaci<br>
+- Registrace = auto login draft (registrace uživatele rovnou vytváří session)<br>
 
 2013-01-31<br>
 - Facebook registrace + login draft<br>
@@ -139,7 +145,8 @@ Changelog
 -- Číselníky --
 Vypise seznam zemi<br>
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public
 GET /api.list/country/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -165,7 +172,8 @@ GET /api.list/country/
 
 Detail země<br>
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public
 GET /api.list/country/165872/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -181,7 +189,8 @@ GET /api.list/country/165872/
 
 Vypise seznam kraju (CZ a SK)<br>
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public
 GET /api.list/district/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -208,7 +217,8 @@ GET /api.list/district/
 
 Detail kraje<br>
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public
 GET /api.list/district/165873/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -224,7 +234,8 @@ GET /api.list/district/165873/
 
 Vypise seznam mest (CZ a SK)<br>
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public
 GET /api.list/city/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -253,7 +264,8 @@ GET /api.list/city/
 
 Detail mesta<br>
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public
 GET /api.list/city/340780/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -271,7 +283,8 @@ GET /api.list/city/340780/
 -- User / Fan --
 Vypise data uzivatele publicid<br>
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public
 GET /api.fan/publicid/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -376,7 +389,8 @@ GET /api.fan/publicid/
 
 Updatuje profilové údaje uživatele (datum narození, jméno, město, pohlaví)<br>
 Access: S<br>
-Status: online
+Status: online<br>
+Permissions: userLogin
 PUT /api.fan/publicid/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -410,7 +424,8 @@ PUT /api.fan/publicid/
 
 Vrací informace o profilovém obrázku uživatele<br>
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public
 GET /api.fan/publicid/profile-image/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -434,7 +449,8 @@ GET /api.fan/publicid/profile-image/
 Updatuje profilový obrázek uživatele<br>
 V případě, že nahraný soubor není validní obrázek, nejsou správně zadány parametry nebo je zadán chybný výřez, vrací se 400 s popisem chyby<br>
 Access: S<br>
-Status: online
+Status: online<br>
+Permissions: userLogin
 PUT /api.fan/publicid/profile-image/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -468,7 +484,8 @@ PUT /api.fan/publicid/profile-image/
 
 Seznam oblibenych kapel uzivatele publicid<br>
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public
 GET /api.fan/publicid/favorite-band-list/?page=1
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -527,7 +544,8 @@ GET /api.fan/publicid/favorite-band-list/?page=1
 
 Pridani kapely do oblibenych - prida kapelu s "id" do oblibenych kapel fanouska publicid (fanousek publicid zalajkuje kapelu s "id")<br>
 Access: S<br>
-Status: online
+Status: online<br>
+Permissions: userLogin
 POST /api.fan/publicid/favorite-band-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -555,7 +573,8 @@ POST /api.fan/publicid/favorite-band-list/
 
 Odebrani kapely z oblibenych - odebere kapelu s "id" z oblibenych kapel fanouska publicid<br>
 Access: S<br>
-Status: online
+Status: online<br>
+Permissions: userLogin
 DELETE /api.fan/publicid/favorite-band-list/7827/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -568,7 +587,8 @@ DELETE /api.fan/publicid/favorite-band-list/7827/
 
 Seznam pratel uzivatele publicid<br>
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public
 GET /api.fan/publicid/friend-list/?page=2
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -631,7 +651,8 @@ GET /api.fan/publicid/friend-list/?page=2
 
 Pridani fanouska do pratel - prida fanouska s "id" do pratel fanouska publicid<br>
 Access: S<br>
-Status: online
+Status: online<br>
+Permissions: userLogin
 POST /api.fan/publicid/friend-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -661,7 +682,8 @@ POST /api.fan/publicid/friend-list/
 
 Odebrani fanouska z pratel - odebere fanouska s "id" z pratel fanouska publicid<br>
 Access: S<br>
-Status: online
+Status: online<br>
+Permissions: userLogin
 DELETE /api.fan/publicid/friend-list/13290/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -674,7 +696,8 @@ DELETE /api.fan/publicid/friend-list/13290/
 
 Seznam akci, kam se chysta fan publicid
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public
 GET /api.fan/publicid/attending-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -739,6 +762,7 @@ GET /api.fan/publicid/attending-list/
 Zjisteni stavu odberu<br>
 Access: S<br>
 Status: online<br>
+Permissions: notifications
 Pokud fanousek nema zadne notifikace, vrati se 204 No Content<br>
 Pokud jsou notifikace zapnute, vrati se aktualne nastavena url a content-type
 GET /api.fan/publicid/notify/
@@ -755,6 +779,7 @@ GET /api.fan/publicid/notify/
 Prihlaseni se k odberu notifikaci fanousk publicid<br>
 Access: S<br>
 Status: online<br>
+Permissions: notifications
 Prihlaseni se k notifikacim je mozne provest jen pokud je prihlasenu fanousek a pouze na jeho ucet.<br>
 Pokud ma fanousek jiz urcene URL pro zasilani notifikaci, puvodni nastaveni se tise prepise novym.<br>
 Zadana URL bude zavolana nasim serverem (POST), kdyz fanouskovi prijde notifikace. URL NESMI presmerovavat.<br>
@@ -780,8 +805,9 @@ POST /api.fan/publicid/notify/
 }
 
 Zruseni odberu notifikaci u fanouska publicid<br>
-Access: W<br>
-Status: obline
+Access: S<br>
+Status: obline<br>
+Permissions: notifications
 DELETE /api.fan/publicid/notify/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -794,6 +820,7 @@ DELETE /api.fan/publicid/notify/
 Výpis fanoušků = uživatelů<br>
 Access: R<br>
 Status: online
+Permissions: public
 GET /api.fan-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -849,7 +876,8 @@ GET /api.fan-list/
 -- Band / Kapela --
 Vypise data kapely publicid<br>
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public
 GET /api.band/publicid/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -970,7 +998,8 @@ GET /api.band/publicid/
 
 Seznam tracku kapely publicid<br>
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public
 GET /api.band/publicid/track-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1005,7 +1034,8 @@ GET /api.band/publicid/track-list/
 
 Seznam alb kapely publicid<br>
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public
 GET /api.band/publicid/album-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1059,7 +1089,8 @@ GET /api.band/publicid/album-list/
 
 Detail alba<br>
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public
 GET /api.band/publicid/album/56561/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1086,7 +1117,8 @@ GET /api.band/publicid/album/56561/
 
 Seznam fanousku kapely publicid<br>
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public
 GET /api.band/publicid/fan-list/?page=33
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1147,7 +1179,8 @@ GET /api.band/publicid/fan-list/?page=33
 
 Výpis kapel<br>
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public
 GET /api.band-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1198,7 +1231,8 @@ GET /api.band-list/
 -- Tracky --
 Vypise detaily tracku<br>
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public|playTracks
 GET /api.track/45324/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1209,13 +1243,14 @@ GET /api.track/45324/
     "type": "track",
     "url": "/api.track/45324/",
     "name": "Papiňák s benzínem",
-    "playUrl": "/api.track/45324/play/",
+    "playUrl": "/api.track/45324/play/",    // vraceno jen klientum s playTracks permission
     "plays": 1203
 }
 
 Prehrani tracku<br>
 Access: W<br>
-Status: online
+Status: online<br>
+Permissions: playTracks
 GET /api.track/45324/play/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1228,6 +1263,7 @@ GET /api.track/45324/play/
 Vypise data akce id<br>
 Access: R<br>
 Status: online
+Permissions: public
 GET /api.gig/id/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1336,7 +1372,8 @@ GET /api.gig/id/
 
 Vypise kapely ucastnici se akce id<br>
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public
 GET /api.gig/id/band-list/?page=1
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1382,7 +1419,8 @@ GET /api.gig/id/band-list/?page=1
 
 Vypise fanousky chystajici se na akci id<br>
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public
 GET /api.gig/id/attendee-list/?page=1
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1430,7 +1468,8 @@ GET /api.gig/id/attendee-list/?page=1
 
 Pridani fanouska na attendee-list akce
 Access: S<br>
-Status: online
+Status: online<br>
+Permissions: userLogin
 POST /api.gig/id/attendee-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1456,7 +1495,8 @@ POST /api.gig/id/attendee-list/
 
 Smazani fanouska z attendee-listu akce
 Access: S<br>
-Status: online+TODO
+Status: online+TODO<br>
+Permissions: userLogin
 DELETE /api.gig/id/attendee-list/13222/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1478,11 +1518,12 @@ DELETE /api.gig/id/attendee-list/13222/
 Výpis / hledání akcí<br>
 Access: R<br>
 Status: online<br>
+Permissions: public<br>
 Filtry:<br>
 q: fulltext query<br>
 startDate: pocatecni datum koncertu (YYYY-MM-DD), default (null, nezadano) je NOW<br>
 endDate: konecne datum koncertu (YYYY-MM-DD), defualt (null, nezadano) je no limit<br>
-lat, long:
+lat, long: GPS souřadnice v desetinném tvaru
 GET /api.gig-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1610,7 +1651,8 @@ GET /api.gig-list/
 
 Detail klubu<br>
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public
 GET /api.venue/id/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1634,7 +1676,8 @@ GET /api.venue/id/
 
 Vypis klubu<br>
 Access: R<br>
-Status: online
+Status: online<br>
+Permissions: public
 GET /api.venue-list/?q=fleda
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1678,7 +1721,8 @@ Přihlášení uživatele, získání user tokenu<br>
 201 v případě správne kombinace loginu a hesla<br>
 Za login a password nutno doplnit platný login<br>
 Access: W<br>
-Status: online
+Status: online<br>
+Permissions: userLogin
 POST /api.session/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1709,14 +1753,15 @@ login=username&password=hesloneasi
 Přihlášení facebook uživatele, získání user tokenu<br>
 201 v případě správných údajů<br>
 Access: W<br>
-Status: draft
+Status: online<br>
+Permissions: userLogin
 POST /api.fb-session/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
 > Content-Type: application/json
 {
     "userId": "629018629",    // FB id uživatele
-    "accessToken": "AAABrOKqhkPgBAJvJGrSYh7zU2lNNE5iYD7IKL7T6Cm3sZAbp4QZA6MWPDwRJvdZAW1e513bssIuNxwJJ9gNasrxKLh78jda04aK4gYB8QZDZD",    // FB access token
+    "accessToken": "AAABrOKqhkPgBAJvJGrSYh7zU2lNNE5iYD7IKL7T6Cm3sZAbp4QZA6MWPDwRJvdZAW1e513bssIuNxwJJ9gNasrxKLh78jda04aK4gYB8QZDZD"    // FB access token
 }
 < 201
 < Content-Type: application/json
@@ -1742,7 +1787,8 @@ POST /api.fb-session/
 
 Získání informací o přihlášeném uživateli<br>
 Access: S<br>
-Status: online
+Status: online<br>
+Permissions: userLogin
 GET /api.session/03487c7b2673a260f68537d65f5b9d0e64864302/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1767,7 +1813,8 @@ GET /api.session/03487c7b2673a260f68537d65f5b9d0e64864302/
 
 Odhlášení uživatele<br>
 Access: S<br>
-Status: online
+Status: online<br>
+Permissions: userLogin
 DELETE /api.session/03487c7b2673a260f68537d65f5b9d0e64864302/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1782,7 +1829,8 @@ DELETE /api.session/03487c7b2673a260f68537d65f5b9d0e64864302/
 
 Vytvoření účtu<br>
 Access: W<br>
-Status: online
+Status: online<br>
+Permissions: userRegistration
 POST /api.register/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1828,14 +1876,15 @@ POST /api.register/
 
 Vytvoření účtu<br>
 Access: W<br>
-Status: draft
+Status: online<br>
+Permissions: userRegistration
 POST /api.fb-register/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
 > Content-Type: application/json
 {
     "userId": "629018629",    // FB id uživatele
-    "accessToken": "AAABrOKqhkPgBAJvJGrSYh7zU2lNNE5iYD7IKL7T6Cm3sZAbp4QZA6MWPDwRJvdZAW1e513bssIuNxwJJ9gNasrxKLh78jda04aK4gYB8QZDZD",    // FB access token
+    "accessToken": "AAABrOKqhkPgBAJvJGrSYh7zU2lNNE5iYD7IKL7T6Cm3sZAbp4QZA6MWPDwRJvdZAW1e513bssIuNxwJJ9gNasrxKLh78jda04aK4gYB8QZDZD"    // FB access token
 }
 < 201
 < Content-Type: application/json
@@ -1877,7 +1926,8 @@ Soubor je uploadován pro kombinaci klient + uživatel, uživatelé a klienti te
 
 Upload souboru<br>
 Access: S<br>
-Status: online
+Status: online<br>
+Permissions: uploadFiles
 POST /api.file-upload/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1898,7 +1948,8 @@ POST /api.file-upload/
 
 Mazání uploadovaného souboru<br>
 Access: S<br>
-Status: online
+Status: online<br>
+Permissions: uploadFiles
 DELETE /api.file-upload/ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1912,7 +1963,8 @@ DELETE /api.file-upload/ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c/
 
 Získání informací o uploadovaném souboru<br>
 Access: S<br>
-Status: online
+Status: online<br>
+Permissions: uploadFiles
 GET /api.file-upload/ad08094dbe3e9de0e2c61a9d8377dafc7ff27a3c/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
