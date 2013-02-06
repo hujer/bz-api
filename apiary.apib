@@ -147,7 +147,9 @@ Changelog
 Vypise seznam zemi<br>
 Access: R<br>
 Status: online<br>
-Permissions: public
+Permissions: public<br>
+Filtry/parametry:<br>
+q: fulltext query
 GET /api.list/country/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -191,7 +193,10 @@ GET /api.list/country/165872/
 Vypise seznam kraju (CZ a SK)<br>
 Access: R<br>
 Status: online<br>
-Permissions: public
+Permissions: public<br>
+Filtry/parametry:<br>
+q: fulltext query<br>
+country: země (id)
 GET /api.list/district/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -236,7 +241,11 @@ GET /api.list/district/165873/
 Vypise seznam mest (CZ a SK)<br>
 Access: R<br>
 Status: online<br>
-Permissions: public
+Permissions: public<br>
+Filtry/parametry:<br>
+q: fulltext query<br>
+country: země (id)<br>
+district: kraj (id)
 GET /api.list/city/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -820,8 +829,10 @@ DELETE /api.fan/publicid/notify/
 
 Výpis fanoušků = uživatelů<br>
 Access: R<br>
-Status: online
-Permissions: public
+Status: online<br>
+Permissions: public<br>
+Filtry/parametry:<br>
+q: fulltext query
 GET /api.fan-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1181,7 +1192,9 @@ GET /api.band/publicid/fan-list/?page=33
 Výpis kapel<br>
 Access: R<br>
 Status: online<br>
-Permissions: public
+Permissions: public<br>
+Filtry/parametry:<br>
+q: fulltext query
 GET /api.band-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1523,11 +1536,12 @@ Výpis / hledání akcí<br>
 Access: R<br>
 Status: online+draft<br>
 Permissions: public|venueExclusive<br>
-Filtry:<br>
+Filtry/parametry:<br>
 q: fulltext query<br>
 startDate: pocatecni datum koncertu (YYYY-MM-DD), default (null, nezadano) je NOW<br>
 endDate: konecne datum koncertu (YYYY-MM-DD), defualt (null, nezadano) je no limit<br>
-lat, long: GPS souřadnice v desetinném tvaru
+lat, long: GPS souřadnice v desetinném tvaru<br>
+radius: omezení vzdálenosti (např. 2km, 500m atd.)
 GET /api.gig-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1687,7 +1701,11 @@ GET /api.venue/id/
 Vypis klubu<br>
 Access: R<br>
 Status: online+draft<br>
-Permissions: public|venueExclusive
+Permissions: public|venueExclusive<br>
+Filtry/parametry:<br>
+q: fulltext query<br>
+lat, long: GPS souřadnice v desetinném tvaru<br>
+radius: omezení vzdálenosti (např. 2km, 500m atd.)
 GET /api.venue-list/?q=fleda
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
