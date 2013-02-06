@@ -1262,8 +1262,8 @@ GET /api.track/45324/play/
 -- Gig / Akce --
 Vypise data akce id<br>
 Access: R<br>
-Status: online
-Permissions: public
+Status: online<br>
+Permissions: public|venueExclusive
 GET /api.gig/id/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1518,7 +1518,7 @@ DELETE /api.gig/id/attendee-list/13222/
 Výpis / hledání akcí<br>
 Access: R<br>
 Status: online<br>
-Permissions: public<br>
+Permissions: public|venueExclusive<br>
 Filtry:<br>
 q: fulltext query<br>
 startDate: pocatecni datum koncertu (YYYY-MM-DD), default (null, nezadano) je NOW<br>
@@ -1652,7 +1652,7 @@ GET /api.gig-list/
 Detail klubu<br>
 Access: R<br>
 Status: online<br>
-Permissions: public
+Permissions: public|venueExclusive
 GET /api.venue/id/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1677,7 +1677,7 @@ GET /api.venue/id/
 Vypis klubu<br>
 Access: R<br>
 Status: online<br>
-Permissions: public
+Permissions: public|venueExclusive
 GET /api.venue-list/?q=fleda
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
