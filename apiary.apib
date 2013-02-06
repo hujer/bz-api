@@ -8,7 +8,7 @@ API funguje read-only i bez header fields Client-Id a Client-Key.<br>
 Pro prihlasovani a dalsi funkce je nutno mit platnou kombinaci Client-Id a Client-Key.<br>
 Po prihlaseni je pro identifikaci uzivatele nutno posilat dalsi header User-Token - id aktivni session.<br>
 Pokud je aktivni session, lze misto publicid uzivatele pouzit specialni "_me", ktere znamena "prave prihlaseny user".<br>
-Access levels: R - read (public), W - write (Client-Id + Client-Key), S - session (lze pouzit jen pokud je prihlaseny user, Client-Id + Client-Key + User-Token)
+Access levels: R - read (public), W - write (Client-Id + Client-Key), S - session (lze pouzit jen pokud je prihlaseny user, Client-Id + Client-Key + User-Token)<br>
 Permissions: public, client, userLogin, userRegistration, playTracks, uploadFiles, notifications, venueExclusive
 
 Strankovani vypisu
@@ -55,6 +55,7 @@ Changelog
 - Zpřísnění přístupu k některým requestům, klient musí mít správné permissions (je tedy nutné klienta identifikovat pomocí Client-Id a Client-Key), indikováno Permissions: zde v dokumentaci<br>
 - Registrace = auto login draft (registrace uživatele rovnou vytváří session)<br>
 - Budvar Y/N draft<br>
+- Doc update: přidány seznamy parametrů k *-list requestům
 
 2013-01-31<br>
 - Facebook registrace + login draft<br>
