@@ -50,6 +50,10 @@ TODO
 --
 Changelog
 
+2013-02-14<br>
+- alba: zmena indikace datumu vydani: year+released<br>
+- gig/band-list: indikace kapel, co nemaji profil na bandzone (stub)<br>
+
 2013-02-13<br>
 - Budvar Y/N @ venue online (jen pro venueExclusive klienty)<br>
 - Register = auto session online
@@ -1080,7 +1084,8 @@ GET /api.band/publicid/album-list/
             },
             "tracks": 5,
             "media": "cd",   // "cd", "dvd", "vinyl", "digital", "mc", "other"
-            "released": "2010",  // year or full date YYYY-MM-DD
+            "year": "2012", // release year
+            "released": null,  // exact release date if available
             //TODO: additional info, producent atd.
         },
         {
@@ -1098,7 +1103,8 @@ GET /api.band/publicid/album-list/
             },
             "tracks": 12,
             "media": "cd",
-            "released": "2012-03-21",
+            "year": 2011,   // release year
+            "released": "2011-03-21",   // exact release date
             //TODO: additional info
         }
     ]
@@ -1128,7 +1134,8 @@ GET /api.band/publicid/album/56561/
     },
     "tracks": 12,
     "media": "cd",  // "cd", "dvd", "vinyl", "digital", "mc", "other"
-    "released": "2012-03-21",
+    "year": 2011,   // release year
+    "released": "2011-03-21",   // exact release date
     //TODO: additional info
 }
 
@@ -1358,7 +1365,7 @@ GET /api.gig/id/
     },
     "bandList": {
         "url": "/api.gig/id/band-list",
-        "total": 2,
+        "total": 3,
         "items": [
             {
                 "id": 104,
@@ -1368,6 +1375,7 @@ GET /api.gig/id/
                 "name": "Insania",
                 "genre": "post hardcore-metal",
                 "city": "Brno",
+                "favorite": false,
                 "image": {
                     "small": {
                         "url": "http://usr.bandzone.cz/band/in/insania/gallery/profile.default/V2sJ_D8m0ujWqb11mhbFiR0c1LzbXZR5.jpg"
@@ -1382,10 +1390,25 @@ GET /api.gig/id/
                 "name": "Našrot",
                 "genre": "hardcore-crossover",
                 "city": "Havlíčkův Brod",
+                "favorite": false,
                 "image": {
                     "small": {
                         "url": "http://usr.bandzone.cz/band/na/nasrot/gallery/profile.default/B3XMhWX6LDsejGGGfNU34uMi0tO1low0.jpg"
                     }
+                }
+            },
+            {
+                "id": 674604,
+                "type": "bandstub", // kapela bez profilu na BZ
+                "webUrl": "http://horselords.bandcamp.com/",  // external URL, vklada uzivatel (=bez zaruky)
+                "name": "Horse Lords",
+                "genre": null,  // null or string
+                "city": "vancouver",
+                "favorite": false,
+                "image": {
+                    "default": true, // default image
+                    "small": "http://bandzone3.hjr.bz/img/default/band-multiple-small.png",
+                    "profile": "http://bandzone3.hjr.bz/img/default/band-multiple.png"
                 }
             }
         ]
@@ -1403,7 +1426,7 @@ GET /api.gig/id/band-list/?page=1
 < Content-Type: application/json
 {
     "url": "/api.gig/id/band-list/",
-    "total": 2,
+    "total": 3,
     "totalPages": 1,
     "page": 1,
     "pageSize": 10,
@@ -1434,6 +1457,20 @@ GET /api.gig/id/band-list/?page=1
                 "small": {
                     "url": "http://usr.bandzone.cz/band/na/nasrot/gallery/profile.default/B3XMhWX6LDsejGGGfNU34uMi0tO1low0.jpg"
                 }
+            }
+        },
+        {
+            "id": 674604,
+            "type": "bandstub", // kapela bez profilu na BZ
+            "webUrl": "http://horselords.bandcamp.com/",  // external URL, vklada uzivatel (=bez zaruky)
+            "name": "Horse Lords",
+            "genre": null,  // null or string
+            "city": "vancouver",
+            "favorite": false,
+            "image": {
+                "default": true, // default image
+                "small": "http://bandzone3.hjr.bz/img/default/band-multiple-small.png",
+            "profile": "http://bandzone3.hjr.bz/img/default/band-multiple.png"
             }
         }
     ]
