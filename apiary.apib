@@ -9,7 +9,7 @@ Pro prihlasovani a dalsi funkce je nutno mit platnou kombinaci Client-Id a Clien
 Po prihlaseni je pro identifikaci uzivatele nutno posilat dalsi header User-Token - id aktivni session.<br>
 Pokud je aktivni session, lze misto publicid uzivatele pouzit specialni "_me", ktere znamena "prave prihlaseny user".<br>
 Access levels: R - read (public), W - write (Client-Id + Client-Key), S - session (lze pouzit jen pokud je prihlaseny user, Client-Id + Client-Key + User-Token)<br>
-Permissions: public, client, userLogin, userRegistration, playTracks, uploadFiles, notifications, venueExclusive
+Permissions: public, client, userLogin, userRegistration, playTracks, uploadFiles, notifications, venueExclusive, tempRegistration
 
 Strankovani vypisu
 --
@@ -45,14 +45,35 @@ Registrace probíhá POST requestem na /api.fb-register/, potřebujeme facebooko
 
 Error responses
 --
-TODO
+Při chybě 404 u POST requestů se vrací odpověď:
+<pre>
+{
+    "errors": [
+        "Popis prvni chyby",
+        "Popis dalsi chyby"
+    ],
+    "fields": {
+        "klic1": "Popis chyby na klic1",
+        "login": "Key login must be at least 3 characters long"
+    },
+    "http": {
+        
+    }
+}
+</pre>
 
 --
 Changelog
 
+2013-02-15<br>
+- zmena odpovedi u POST /api.session/, GET /api.session/, POST /api.fb-session/, POST /api.register/, POST /api.fb-register/ tak, aby byly stejne<br>
+- parametr loginIfExitsts u POST /api.fb-register/
+
 2013-02-14<br>
 - alba: zmena indikace datumu vydani: year+released<br>
 - gig/band-list: indikace kapel, co nemaji profil na bandzone (stub)<br>
+- Doc update: error responses<br>
+- Registrace: temp registrace, mazani po peti minutach + doc update<br>
 
 2013-02-13<br>
 - Budvar Y/N @ venue online (jen pro venueExclusive klienty)<br>
@@ -1804,8 +1825,10 @@ login=username&password=hesloneasi
 < 201
 < Content-Type: application/json
 {
-    "url": "/api.session/03487c7b2673a260f68537d65f5b9d0e64864302/", // tady lze ziskat informace o session
-    "user-token": "03487c7b2673a260f68537d65f5b9d0e64864302",
+    "session": {
+        "url": "/api.session/03487c7b2673a260f68537d65f5b9d0e64864302/", // tady lze ziskat informace o session
+        "user-token": "03487c7b2673a260f68537d65f5b9d0e64864302",
+    },
     "user": {
         "id": 666,
         "type": "fan",
@@ -1839,8 +1862,10 @@ POST /api.fb-session/
 < 201
 < Content-Type: application/json
 {
-    "url": "/api.session/03487c7b2673a260f68537d65f5b9d0e64864302/", // tady lze ziskat informace o session
-    "user-token": "03487c7b2673a260f68537d65f5b9d0e64864302",
+    "session": {
+        "url": "/api.session/03487c7b2673a260f68537d65f5b9d0e64864302/", // tady lze ziskat informace o session
+        "user-token": "03487c7b2673a260f68537d65f5b9d0e64864302",
+    },
     "user": {
         "id": 666,
         "type": "fan",
@@ -1869,17 +1894,23 @@ GET /api.session/03487c7b2673a260f68537d65f5b9d0e64864302/
 < 200
 < Content-Type: application/json
 {
-    "id": 666,
-    "type": "fan",
-    "url": "/api.fan/publicid", // API URL
-    "name": "Franta Vomáčka",   // nick
-    "webUrl": "http://bandzone.cz/fan/publicid",
-    "gender": "M",  // M, F, null
-    "age": 29,    // or null
-    "city": "Praha",    // or null
-    "image": {
-        "small": {
-            "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/goqoA11r0iIH29LnA_dBQg6ohtIULMYt.jpg"
+    "session": {
+        "url": "/api.session/03487c7b2673a260f68537d65f5b9d0e64864302/", // tady lze ziskat informace o session
+        "user-token": "03487c7b2673a260f68537d65f5b9d0e64864302",
+    },
+    "user": {
+        "id": 666,
+        "type": "fan",
+        "url": "/api.fan/publicid", // API URL
+        "name": "Franta Vomáčka",   // nick
+        "webUrl": "http://bandzone.cz/fan/publicid",
+        "gender": "M",  // M, F, null
+        "age": 29,    // or null
+        "city": "Praha",    // or null
+        "image": {
+            "small": {
+                "url": "http://usr.bandzone.cz/fan/hu/hujer/gallery/profile.default/goqoA11r0iIH29LnA_dBQg6ohtIULMYt.jpg"
+            }
         }
     }
 }
@@ -1903,7 +1934,7 @@ DELETE /api.session/03487c7b2673a260f68537d65f5b9d0e64864302/
 Vytvoření účtu<br>
 Access: W<br>
 Status: online<br>
-Permissions: userRegistration
+Permissions: userRegistration|tempRegistration
 POST /api.register/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1914,37 +1945,28 @@ POST /api.register/
     "email": "platny@email.tld",    // platný e-mail, na jednu adresu může být u nás jen jeden účet
     "name": "Franta Vomáčka", // jméno, pod kterým se bude user zobrazovat
     "dob": "1983-02-24", // datum narození, volitelné
-    "cityId": 1234     // z číselníku
+    "cityId": 1234,     // z číselníku
+    "temp": 1    // pro temp registraci (smazani po peti minutach), tempRegistration permission potreba
 }
 < 201
 < Content-Type: application/json
 {
-    "id": 13190,
-    "type": "fan",
-    "url": "/api.fan/publicid/", // API URL
-    "webUrl": "http://bandzone.cz/fan/publicid",    // web URL
-    "name": "User Name",    // jmeno = nick
-    "gender": "M",  // M, F, null
-    "age": 29,    // or null
-    "city": "Praha",    // or null
-    "friend": true,     // pouze pokud je prihlaseny uzivatel
-    "mutual": false,    // -- " --
-    "image": {
-        "small": {
-            "url": "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/dT9BOUxUeJ9mBLLT3G-0mLE3fX6KWyyf.jpg"
+    "user": {
+        "id": 13190,
+        "type": "fan",
+        "url": "/api.fan/publicid/", // API URL
+        "webUrl": "http://bandzone.cz/fan/publicid",    // web URL
+        "name": "User Name",    // jmeno = nick
+        "gender": "M",  // M, F, null
+        "age": 29,    // or null
+        "city": "Praha",    // or null
+        "friend": true,     // pouze pokud je prihlaseny uzivatel
+        "mutual": false,    // -- " --
+        "image": {
+            "small": {
+                "url": "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/dT9BOUxUeJ9mBLLT3G-0mLE3fX6KWyyf.jpg"
+            }
         }
-    },
-    "favoriteBandList": {
-        "url": "/api.fan/publicid/favorite-band-list/",
-        "total": 0,
-        "items": [
-        ]
-    },
-    "friendList": {
-        "url": "/api.fan/publicid/friend-list/",
-        "total": 0,
-        "items": [
-        ]
     },
     "session": {
         "url": "/api.session/03487c7b2673a260f68537d65f5b9d0e64864302/", // tady lze ziskat informace o session
@@ -1964,37 +1986,29 @@ POST /api.fb-register/
 > Content-Type: application/json
 {
     "userId": "629018629",    // FB id uživatele
-    "accessToken": "AAABrOKqhkPgBAJvJGrSYh7zU2lNNE5iYD7IKL7T6Cm3sZAbp4QZA6MWPDwRJvdZAW1e513bssIuNxwJJ9gNasrxKLh78jda04aK4gYB8QZDZD"    // FB access token
+    "accessToken": "AAABrOKqhkPgBAJvJGrSYh7zU2lNNE5iYD7IKL7T6Cm3sZAbp4QZA6MWPDwRJvdZAW1e513bssIuNxwJJ9gNasrxKLh78jda04aK4gYB8QZDZD",    // FB access token
+    "temp": 1,    // pro temp registraci (smazani po peti minutach), tempRegistration permission potreba
+    "loginIfExists": 1 // pokud nastaveno a dany uzivatel v db jiz existuje, nevyhodime chybovou hlasku, ale tise ho prihlasime
 }
 < 201
 < Content-Type: application/json
 {
-    "id": 13190,
-    "type": "fan",
-    "url": "/api.fan/publicid/", // API URL
-    "webUrl": "http://bandzone.cz/fan/publicid",    // web URL
-    "name": "User Name",    // jmeno = nick
-    "gender": "M",  // M, F, null
-    "age": 29,    // or null
-    "city": "Praha",    // or null
-    "friend": true,     // pouze pokud je prihlaseny uzivatel
-    "mutual": false,    // -- " --
-    "image": {
-        "small": {
-            "url": "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/dT9BOUxUeJ9mBLLT3G-0mLE3fX6KWyyf.jpg"
+    "user": {
+        "id": 13190,
+        "type": "fan",
+        "url": "/api.fan/publicid/", // API URL
+        "webUrl": "http://bandzone.cz/fan/publicid",    // web URL
+        "name": "User Name",    // jmeno = nick
+        "gender": "M",  // M, F, null
+        "age": 29,    // or null
+        "city": "Praha",    // or null
+        "friend": true,     // pouze pokud je prihlaseny uzivatel
+        "mutual": false,    // -- " --
+        "image": {
+            "small": {
+                "url": "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/dT9BOUxUeJ9mBLLT3G-0mLE3fX6KWyyf.jpg"
+            }
         }
-    },
-    "favoriteBandList": {   // list 5 polozek automaticky
-        "url": "/api.fan/publicid/favorite-band-list/",
-        "total": 0,
-        "items": [
-        ]
-    },
-    "friendList": {
-        "url": "/api.fan/publicid/friend-list/",
-        "total": 0,
-        "items": [
-        ]
     },
     "session": {
         "url": "/api.session/03487c7b2673a260f68537d65f5b9d0e64864302/", // tady lze ziskat informace o session
