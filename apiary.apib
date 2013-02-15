@@ -57,7 +57,8 @@ Při chybě 404 u POST requestů se vrací odpověď:
         "login": "Key login must be at least 3 characters long"
     },
     "http": {
-        
+        "code": 400,    // repeated HTTP status code
+        "message": "Validation failed." // repeated HTTP status message
     }
 }
 </pre>
