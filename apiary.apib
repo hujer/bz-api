@@ -66,6 +66,9 @@ Při chybě 404 u POST requestů se vrací odpověď:
 --
 Changelog
 
+2013-02-18<br>
+- friends / favorite bands sorting<br>
+
 2013-02-15<br>
 - zmena odpovedi u POST /api.session/, GET /api.session/, POST /api.fb-session/, POST /api.register/, POST /api.fb-register/ tak, aby byly stejne<br>
 - parametr loginIfExitsts u POST /api.fb-register/
@@ -526,7 +529,9 @@ PUT /api.fan/publicid/profile-image/
 Seznam oblibenych kapel uzivatele publicid<br>
 Access: R<br>
 Status: online<br>
-Permissions: public
+Permissions: public<br>
+Parametry:<br>
+- sort: name/added (default = added): tridit dle jmena / data pridani
 GET /api.fan/publicid/favorite-band-list/?page=1
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -629,7 +634,9 @@ DELETE /api.fan/publicid/favorite-band-list/7827/
 Seznam pratel uzivatele publicid<br>
 Access: R<br>
 Status: online<br>
-Permissions: public
+Permissions: public<br>
+Parametry:<br>
+- sort: name/added (default = added): tridit dle jmena / data pridani
 GET /api.fan/publicid/friend-list/?page=2
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
