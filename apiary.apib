@@ -66,6 +66,11 @@ Při chybě 404 u POST requestů se vrací odpověď:
 --
 Changelog
 
+2013-02-27<br>
+- email login (POST /api.session/) - moznost pouzit e-mail misto login pro prihlaseni<br>
+- prodlouzena platnost session na 30d<br>
+- doc: pridan login regexp u POST /api.session/: /^[a-z0-9]{3,32}$/<br>
+
 2013-02-18<br>
 - friends / favorite bands sorting<br>
 
@@ -1824,7 +1829,10 @@ Přihlášení uživatele, získání user tokenu<br>
 Za login a password nutno doplnit platný login<br>
 Access: W<br>
 Status: online<br>
-Permissions: userLogin
+Permissions: userLogin<br>
+Parametry:<br>
+login: login (fan publicId) nebo e-mail uzivatele<br>
+passowrd: heslo
 POST /api.session/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1948,7 +1956,7 @@ POST /api.register/
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
 > Content-Type: application/json
 {
-    "login": "username",    // uzivatelske jmeno, musi byt unikatni
+    "login": "username",    // uzivatelske jmeno, musi byt unikatni, /^[a-z0-9]{3,32}$/
     "password": "heslo",    // heslo, alespoň 5 znaků
     "email": "platny@email.tld",    // platný e-mail, na jednu adresu může být u nás jen jeden účet
     "name": "Franta Vomáčka", // jméno, pod kterým se bude user zobrazovat
