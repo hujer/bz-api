@@ -67,10 +67,10 @@ Při chybě 404 u POST requestů se vrací odpověď:
 Changelog
 
 2013-03-01<br>
-- pridany trackSource (prava ke zdrojum tracku), membershipInfo (prava na cteni band membership) permissions
-- draft: pridan preview track list k detailu alba GET /api.band/publicid/album/albumid/
-- draft: pridany track listy k album: GET /api.band/publicid/album/albumid/track-list/
-- draft: pridano info o clenstvi v kapelach GET /api.fan/publicid/, GET /api.fan/publicid/membership-list/
+- pridany trackSource (prava ke zdrojum tracku), membershipInfo (prava na cteni band membership) permissions<br>
+- draft: pridan preview track list k detailu alba GET /api.band/publicid/album/albumid/<br>
+- draft: pridany track listy k album: GET /api.band/publicid/album/albumid/track-list/<br>
+- draft: pridano info o clenstvi v kapelach GET /api.fan/publicid/, GET /api.fan/publicid/membership-list/<br>
 
 2013-02-27<br>
 - email login (POST /api.session/) - moznost pouzit e-mail misto login pro prihlaseni<br>
@@ -439,7 +439,7 @@ GET /api.fan/publicid/
             }
         ]
     },
-    "membershipList": { // klientum s membershipInfo se ukazuji i neviditelne kapely (jen pokud je uzivatel prihlasen)
+    "membershipList": { // draft: klientum s membershipInfo se ukazuji i neviditelne kapely (jen pokud je uzivatel prihlasen)
         "url": "/api.fan/publicid/membership-list/",
         "total": 2,
         "items": [  // preview list
