@@ -9,7 +9,7 @@ Pro prihlasovani a dalsi funkce je nutno mit platnou kombinaci Client-Id a Clien
 Po prihlaseni je pro identifikaci uzivatele nutno posilat dalsi header User-Token - id aktivni session.<br>
 Pokud je aktivni session, lze misto publicid uzivatele pouzit specialni "_me", ktere znamena "prave prihlaseny user".<br>
 Access levels: R - read (public), W - write (Client-Id + Client-Key), S - session (lze pouzit jen pokud je prihlaseny user, Client-Id + Client-Key + User-Token)<br>
-Permissions: public, client, userLogin, userRegistration, playTracks, uploadFiles, notifications, venueExclusive, tempRegistration
+Permissions: public, client, userLogin, userRegistration, trackPlay, uploadFiles, notifications, venueExclusive, tempRegistration, trackSource, membershipInfo
 
 Strankovani vypisu
 --
@@ -65,6 +65,12 @@ Při chybě 404 u POST requestů se vrací odpověď:
 
 --
 Changelog
+
+2013-03-01<br>
+- pridany trackSource (prava ke zdrojum tracku), membershipInfo (prava na cteni band membership) permissions
+- draft: pridan preview track list k detailu alba GET /api.band/publicid/album/albumid/
+- draft: pridany track listy k album: GET /api.band/publicid/album/albumid/track-list/
+- draft: pridano info o clenstvi v kapelach GET /api.fan/publicid/, GET /api.fan/publicid/membership-list/
 
 2013-02-27<br>
 - email login (POST /api.session/) - moznost pouzit e-mail misto login pro prihlaseni<br>
@@ -332,8 +338,8 @@ GET /api.list/city/340780/
 -- User / Fan --
 Vypise data uzivatele publicid<br>
 Access: R<br>
-Status: online<br>
-Permissions: public
+Status: online + draft<br>
+Permissions: public, (membershipInfo)
 GET /api.fan/publicid/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -432,6 +438,42 @@ GET /api.fan/publicid/
                 }
             }
         ]
+    },
+    "membershipList": { // klientum s membershipInfo se ukazuji i neviditelne kapely (jen pokud je uzivatel prihlasen)
+        "url": "/api.fan/publicid/membership-list/",
+        "total": 2,
+        "items": [  // preview list
+            {
+                "id": 1040,
+                "type": "band",
+                "url": "/api.band/kombucha/",
+                "webUrl": "http://bandzone.cz/kombucha",
+                "name": "Kombucha",
+                "genre": "aggro-psychedelic",
+                "city": "Praha",
+                "image": {
+                    "small": {
+                        "url": "http://usr.bandzone.cz/band/ko/kombucha/gallery/profile.default/384269_t_s.jpg"
+                    }
+                },
+                "membership": "O"   // O = owner, A = administrator, M = member
+            },
+            {
+                "id": 2196,
+                "type": "band",
+                "url": "/api.band/ahumadogranujo/",
+                "webUrl": "http://bandzone.cz/ahumadogranujo",
+                "name": "Ahumado Granujo",
+                "genre": "grind-dance music",
+                "city": "Praha",
+                "image": {
+                    "small": {
+                        "url": "http://usr.bandzone.cz/band/ah/ahumadogranujo/gallery/profile.default/x4n0jvF8qnazQiI1L8Nv4BNG-7HOc2fL.jpg"
+                    }
+                },
+                "membership": "M"   // O = owner, A = administrator, M = member
+            }
+        ]
     }
 }
 
@@ -464,11 +506,8 @@ PUT /api.fan/publicid/
     "city": "Praha",    // or null
     "friend": true,     // pouze pokud je prihlaseny uzivatel
     "mutual": false,    // -- " --
-    "image": null,
-    "favoriteBandList": []
-    }
+    "image": null
 }
-
 
 
 Vrací informace o profilovém obrázku uživatele<br>
@@ -702,6 +741,7 @@ GET /api.fan/publicid/friend-list/?page=2
     ]
 }
 
+
 Pridani fanouska do pratel - prida fanouska s "id" do pratel fanouska publicid<br>
 Access: S<br>
 Status: online<br>
@@ -733,6 +773,7 @@ POST /api.fan/publicid/friend-list/
     }
 }
 
+
 Odebrani fanouska z pratel - odebere fanouska s "id" z pratel fanouska publicid<br>
 Access: S<br>
 Status: online<br>
@@ -746,6 +787,57 @@ DELETE /api.fan/publicid/friend-list/13290/
 {
     // empty response
 }
+
+
+Seznam kapel, ve kterych je fanousek clenem
+Access: R<br>
+Status: draft<br>
+Permissions: public, (membershipInfo)
+GET /api.fan/publicid/membership-list/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "url": "/api.fan/publicid/membership-list",
+    "total": 5,
+    "totalPages": 1,
+    "page": 0,
+    "pageSize": 20,
+    "items": [  // klientum s membershipInfo jsou pri aktivni session vraceny i neviditelne kapely, kterych je fanousek clenem
+        {
+            "id": 1040,
+            "type": "band",
+            "url": "/api.band/kombucha/",
+            "webUrl": "http://bandzone.cz/kombucha",
+            "name": "Kombucha",
+            "genre": "aggro-psychedelic",
+            "city": "Praha",
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/band/ko/kombucha/gallery/profile.default/384269_t_s.jpg"
+                }
+            },
+            "membership": "O"   // O = owner, A = administrator, M = member
+        },
+        {
+            "id": 2196,
+            "type": "band",
+            "url": "/api.band/ahumadogranujo/",
+            "webUrl": "http://bandzone.cz/ahumadogranujo",
+            "name": "Ahumado Granujo",
+            "genre": "grind-dance music",
+            "city": "Praha",
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/band/ah/ahumadogranujo/gallery/profile.default/x4n0jvF8qnazQiI1L8Nv4BNG-7HOc2fL.jpg"
+                }
+            },
+            "membership": "M"   // O = owner, A = administrator, M = member
+        }
+    ]
+}
+
 
 Seznam akci, kam se chysta fan publicid
 Access: R<br>
@@ -931,8 +1023,8 @@ GET /api.fan-list/
 -- Band / Kapela --
 Vypise data kapely publicid<br>
 Access: R<br>
-Status: online<br>
-Permissions: public
+Status: online + draft<br>
+Permissions: public, (trackPlay), (trackSource)
 GET /api.band/publicid/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -965,7 +1057,8 @@ GET /api.band/publicid/
                 "id": 68055,
                 "type": "track",
                 "url": "/api.track/45324/",
-                "playUrl": "/api.track/45324/play/", // URL for audio playing
+                "playUrl": "/api.track/45324/play/", // URL for audio playing, vraceno jen klientum s trackPlay permission
+                "sourceUrl": "http://media.bandzone.cz/T7a76ph4DRExewR9s76PhestUhuDUyEd.flac",   // draft: URL zdrojoveho tracku, vraceno jen klientum s trackSource permission
                 "name": "Papiňák s benzínem",
                 "plays": 1203
             },
@@ -973,7 +1066,8 @@ GET /api.band/publicid/
                 "id": 68072,
                 "type": "track",
                 "url": "/api.track/53641/",
-                "playUrl": "/api.track/53641/play/", // URL for audio playing
+                "playUrl": "/api.track/53641/play/", // URL for audio playing, vraceno jen klientum s trackPLay permission
+                "sourceUrl": "http://media.bandzone.cz/4E3emuthuw2spUFR3jeBrusaCh8neK8D.flac",  // draft: URL zdrojoveho tracku, vraceno jen klientum s trackSource permission
                 "name": "Babička Věra",
                 "plays": 1431
             }
@@ -1053,8 +1147,8 @@ GET /api.band/publicid/
 
 Seznam tracku kapely publicid<br>
 Access: R<br>
-Status: online<br>
-Permissions: public
+Status: online + draft<br>
+Permissions: public, (trackPlay), (trackSource)
 GET /api.band/publicid/track-list/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1065,13 +1159,14 @@ GET /api.band/publicid/track-list/
     "total": 15,
     "totalPages": 1,
     "page": 0,
-    "pageSize": 10,
+    "pageSize": 20,
     "items": [
         {
             "id": 68055,
             "type": "track",
             "url": "/api.track/45324/",
-            "playUrl": "/api.track/45324/play/", // URL for audio playing
+            "playUrl": "/api.track/45324/play/", // URL for audio playing, jen trackPlay permission
+            "sourceUrl": "http://media.bandzone.cz/T7a76ph4DRExewR9s76PhestUhuDUyEd.flac",   // draft: URL zdrojoveho tracku, vraceno jen klientum s trackSource permission
             "name": "Papiňák s benzínem",
             "plays": 1203
         },
@@ -1079,7 +1174,8 @@ GET /api.band/publicid/track-list/
             "id": 68072,
             "type": "track",
             "url": "/api.track/53641/",
-            "playUrl": "/api.track/53641/play/", // URL for audio playing
+            "playUrl": "/api.track/53641/play/", // URL for audio playing, jen trackPlay permission
+            "sourceUrl": "http://media.bandzone.cz/4E3emuthuw2spUFR3jeBrusaCh8neK8D.flac",  // draft: URL zdrojoveho tracku, vraceno jen klientum s trackSource permission
             "name": "Babička Věra",
             "plays": 1431
         },
@@ -1146,8 +1242,8 @@ GET /api.band/publicid/album-list/
 
 Detail alba<br>
 Access: R<br>
-Status: online<br>
-Permissions: public
+Status: online + draft: trackList<br>
+Permissions: public, (trackPlay)
 GET /api.band/publicid/album/56561/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1156,7 +1252,7 @@ GET /api.band/publicid/album/56561/
 {
     "id": 53315,
     "type": "album",
-    "url": "/api.band/publicid/album/58559/",
+    "url": "/api.band/publicid/album/56561/",
     "name": "OFF",
     "image": {
         "small": {
@@ -1170,8 +1266,68 @@ GET /api.band/publicid/album/56561/
     "media": "cd",  // "cd", "dvd", "vinyl", "digital", "mc", "other"
     "year": 2011,   // release year
     "released": "2011-03-21",   // exact release date
-    //TODO: additional info
+    "trackList": {
+        "url": "/api.band/publicid/album/58559/track-list/",
+        "total": 12,
+        "items": [  // preview items
+            {
+                "id": 68055,
+                "type": "track",
+                "url": "/api.track/45324/",
+                "playUrl": "/api.track/45324/play/", // URL for audio playing, jen trackPlay permission
+                "name": "Papiňák s benzínem",
+                "plays": 1203
+            },
+            {
+                "id": 68072,
+                "type": "track",
+                "url": "/api.track/53641/",
+                "playUrl": "/api.track/53641/play/", // URL for audio playing, jen trackPlay permission
+                "name": "Babička Věra",
+                "plays": 1431
+            },
+        ]
+    }
 }
+
+Tracky alba<br>
+Access: R<br>
+Status: draft<br>
+Permissions: public, (trackPlay), (trackSource)
+GET /api.band/publicid/album/56561/track-list/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "url": "/api.band/publicid/album/58559/track-list/",
+    "total": 12,
+    "totalPages": 1,
+    "page": 0,
+    "pageSize": 20,
+    "items": [
+        {
+            "id": 68055,
+            "type": "track",
+            "url": "/api.track/45324/",
+            "playUrl": "/api.track/45324/play/", // URL for audio playing, jen trackPlay permission
+            "sourceUrl": "http://media.bandzone.cz/T7a76ph4DRExewR9s76PhestUhuDUyEd.flac",   // draft: URL zdrojoveho tracku, vraceno jen klientum s trackSource permission
+            "name": "Papiňák s benzínem",
+            "plays": 1203
+        },
+        {
+            "id": 68072,
+            "type": "track",
+            "url": "/api.track/53641/",
+            "playUrl": "/api.track/53641/play/", // URL for audio playing, jen trackPlay permission
+            "sourceUrl": "http://media.bandzone.cz/4E3emuthuw2spUFR3jeBrusaCh8neK8D.flac",  // draft: URL zdrojoveho tracku, vraceno jen klientum s trackSource permission
+            "name": "Babička Věra",
+            "plays": 1431
+        },
+        // repeat
+    ]
+}
+
 
 Seznam fanousku kapely publicid<br>
 Access: R<br>
@@ -1292,7 +1448,7 @@ GET /api.band-list/
 Vypise detaily tracku<br>
 Access: R<br>
 Status: online<br>
-Permissions: public|playTracks
+Permissions: public, (trackPlay)
 GET /api.track/45324/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1303,14 +1459,14 @@ GET /api.track/45324/
     "type": "track",
     "url": "/api.track/45324/",
     "name": "Papiňák s benzínem",
-    "playUrl": "/api.track/45324/play/",    // vraceno jen klientum s playTracks permission
+    "playUrl": "/api.track/45324/play/",    // vraceno jen klientum s trackPlay permission
     "plays": 1203
 }
 
 Prehrani tracku<br>
 Access: W<br>
 Status: online<br>
-Permissions: playTracks
+Permissions: trackPlay
 GET /api.track/45324/play/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
