@@ -9,7 +9,7 @@ Pro prihlasovani a dalsi funkce je nutno mit platnou kombinaci Client-Id a Clien
 Po prihlaseni je pro identifikaci uzivatele nutno posilat dalsi header User-Token - id aktivni session.<br>
 Pokud je aktivni session, lze misto publicid uzivatele pouzit specialni "_me", ktere znamena "prave prihlaseny user".<br>
 Access levels: R - read (public), W - write (Client-Id + Client-Key), S - session (lze pouzit jen pokud je prihlaseny user, Client-Id + Client-Key + User-Token)<br>
-Permissions: public, client, userLogin, userRegistration, trackPlay, uploadFiles, notifications, venueExclusive, tempRegistration, trackSource, membershipInfo
+Permissions: public, client, userLogin, userRegistration, trackPlay, uploadFiles, notifications, venueExclusive, tempRegistration, trackSource, membershipInfo, geoSearch
 
 Strankovani vypisu
 --
@@ -65,6 +65,12 @@ Při chybě 404 u POST requestů se vrací odpověď:
 
 --
 Changelog
+
+2013-03-08<br>
+- pridana geoSearch permission<br>
+- GPS souradnice u venues, gigs jen pro geoSearch permission<br>
+- Doc update: "distance" key @ geo queries<br>
+- Pridano info o clenstvi v kapelach pro klienty s membershipInfo<br>
 
 2013-03-01<br>
 - pridany trackSource (prava ke zdrojum tracku), membershipInfo (prava na cteni band membership) permissions<br>
@@ -445,7 +451,7 @@ GET /api.fan/publicid/
         "items": [  // preview list
             {
                 "id": 1040,
-                "type": "band",
+                "type": "bandMembership",
                 "url": "/api.band/kombucha/",
                 "webUrl": "http://bandzone.cz/kombucha",
                 "name": "Kombucha",
@@ -460,7 +466,7 @@ GET /api.fan/publicid/
             },
             {
                 "id": 2196,
-                "type": "band",
+                "type": "bandMembership",
                 "url": "/api.band/ahumadogranujo/",
                 "webUrl": "http://bandzone.cz/ahumadogranujo",
                 "name": "Ahumado Granujo",
@@ -807,7 +813,7 @@ GET /api.fan/publicid/membership-list/
     "items": [  // klientum s membershipInfo jsou pri aktivni session vraceny i neviditelne kapely, kterych je fanousek clenem
         {
             "id": 1040,
-            "type": "band",
+            "type": "bandmembership",
             "url": "/api.band/kombucha/",
             "webUrl": "http://bandzone.cz/kombucha",
             "name": "Kombucha",
@@ -822,7 +828,7 @@ GET /api.fan/publicid/membership-list/
         },
         {
             "id": 2196,
-            "type": "band",
+            "type": "bandmembership",
             "url": "/api.band/ahumadogranujo/",
             "webUrl": "http://bandzone.cz/ahumadogranujo",
             "name": "Ahumado Granujo",
@@ -1479,7 +1485,7 @@ GET /api.track/45324/play/
 Vypise data akce id<br>
 Access: R<br>
 Status: online<br>
-Permissions: public|venueExclusive
+Permissions: public|(venueExclusive)
 GET /api.gig/id/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1508,8 +1514,8 @@ GET /api.gig/id/
         "street2": "",
         "city": "Brno",
         "zip": "60200",
-        "lat": 49.2100761,  // missing in data now
-        "long": 16.6032350,
+        "lat": 49.2100761,  // venueExclusive only
+        "long": 16.6032350, // venueExclusive only
         "externalUrl": "http://fleda.cz/",
         "info": {   // venueExclusive only
             "budvar": true  // true/false
@@ -1767,7 +1773,7 @@ DELETE /api.gig/id/attendee-list/13222/
 Výpis / hledání akcí<br>
 Access: R<br>
 Status: online<br>
-Permissions: public|venueExclusive<br>
+Permissions: public|(venueExclusive)<br>
 Filtry/parametry:<br>
 q: fulltext query<br>
 startDate: pocatecni datum koncertu (YYYY-MM-DD), default (null, nezadano) je NOW<br>
@@ -1789,9 +1795,9 @@ GET /api.gig-list/
         "q": null,  // fulltext query
         "startDate": null,  // YYYY-MM-DD
         "endDate": null,    // YYYY-MM-DD
-        "lat": null,
-        "long": null,
-        "radius": null, // 2km, 500m etc.
+        "lat": null,    // venueExclusive only
+        "long": null,   // venueExclusive only
+        "radius": null, // venueExclusive only: 2km, 500m etc.
     },
     "items": [
         {
@@ -1817,12 +1823,13 @@ GET /api.gig-list/
                 "street2": "",
                 "city": "Brno",
                 "zip": "60200",
-                "lat": 49.2100761,  // missing in data now
-                "long": 16.6032350,
+                "lat": 49.2100761,  // venueExclusive only
+                "long": 16.6032350, // venueExclusive only
                 "externalUrl": "http://fleda.cz/",
                 "info": {   // venueExclusive only
                     "budvar": true  // true/false
-                }
+                },
+                "distance": 543     // venueExclusive only: if geosearch: distance in meters from (lat, long)
             },
             "attending": "A",
             "attendeeList": {   // preview of few items
@@ -1905,7 +1912,7 @@ GET /api.gig-list/
 Detail klubu<br>
 Access: R<br>
 Status: online<br>
-Permissions: public|venueExclusive
+Permissions: public|(venueExclusive)
 GET /api.venue/id/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1922,8 +1929,8 @@ GET /api.venue/id/
     "street2": "",
     "city": "Brno",
     "zip": "60200",
-    "lat": 49.2100761,  // missing in data
-    "long": 16.6032350,
+    "lat": 49.2100761,  // venueExclusive only
+    "long": 16.6032350, // venueExclusive only
     "externalUrl": "http://fleda.cz/",
     "info": {   // venueExclusive only
         "budvar": true  // true/false
@@ -1933,7 +1940,7 @@ GET /api.venue/id/
 Vypis klubu<br>
 Access: R<br>
 Status: online<br>
-Permissions: public|venueExclusive<br>
+Permissions: public|(venueExclusive)<br>
 Filtry/parametry:<br>
 q: fulltext query<br>
 lat, long: GPS souřadnice v desetinném tvaru<br>
@@ -1951,9 +1958,9 @@ GET /api.venue-list/?q=fleda
     "pageSize": 10,
     "filters": {
         "q": "fleda",  // fulltext query
-        "lat": null,    // not currently supported
-        "long": null,
-        "radius": null, // 2km, 500m etc.
+        "lat": null,    // venueExclusive only
+        "long": null,   // venueExclusive only
+        "radius": null, // venueEsclusive only: 2km, 500m etc.
     },
     "items": [
         {
@@ -1967,12 +1974,13 @@ GET /api.venue-list/?q=fleda
             "street2": "",
             "city": "Brno",
             "zip": "60200",
-            "lat": 49.2100761,  // missing in data
-            "long": 16.6032350,
+            "lat": 49.2100761,  // venueExclusive only
+            "long": 16.6032350, // venueExclusive only
             "externalUrl": "http://fleda.cz/",
             "info": {   // venueExclusive only
                 "budvar": true  // true/false
-            }
+            },
+            "distance": 543     // venueExclusive only: if geosearch: distance in meters from (lat, long)
         },
         // repeat
     ]
