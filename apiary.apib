@@ -66,6 +66,9 @@ Při chybě 404 u POST requestů se vrací odpověď:
 --
 Changelog
 
+2013-03-16<br>
+- draft: pridan vypis koncertu pro kazdou kapelu (GET /api.band/publicid/gig-list/) + nahled u kapely (GET /api.band/publicid/)<br>
+
 2013-03-08<br>
 - pridana geoSearch permission<br>
 - GPS souradnice u venues, gigs jen pro geoSearch permission<br>
@@ -1030,7 +1033,7 @@ GET /api.fan-list/
 Vypise data kapely publicid<br>
 Access: R<br>
 Status: online + draft<br>
-Permissions: public, (trackPlay), (trackSource)
+Permissions: public, (trackPlay, trackSource, venueExclusive, geoSearch)
 GET /api.band/publicid/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
@@ -1147,6 +1150,45 @@ GET /api.band/publicid/
                     }
                 }
             }
+        ]
+    },
+    "gigList": {
+        "url": "/api.band/publicid/gig-list/",
+        "total": 6,
+        "items": [  // A preview of few items
+            {
+                "id": 2133493,
+                "type": "gig",
+                "url": "/api.gig/id/",
+                "webUrl": "http://bandzone.cz/akce/id",
+                "name": "25 LET REVOLTY",
+                "startDate": "2012-10-06",
+                "startTime": "20:00:00",
+                "endDate": null,
+                "endTime": null,
+                "entry": "190 Kč na místě",
+                "entryType": "C",    // C = custom (paid?), F = free, V = voluntary
+                "city": "Brno",
+                "venue": {
+                    "id": 588685,
+                    "type": "venue",
+                    "url": "/api.venue/id/", // optional, if not provideded = no venue info
+                    "name": "Fléda",
+                    // only if URL provided
+                    "street1": "Štefánikova 24", // venueExclusive only
+                    "street2": "", // venueExclusive only
+                    "city": "Brno",
+                    "zip": "60200", // venueExclusive only
+                    "lat": 49.2100761,  // venueExclusive only
+                    "long": 16.6032350, // venueExclusive only
+                    "externalUrl": "http://fleda.cz/", // venueExclusive only
+                    "info": {   // venueExclusive only
+                        "budvar": true  // true/false
+                    },
+                    "distance": 543     // venueExclusive only: if geosearch: distance in meters from (lat, long)
+                },
+                "attending": "A",
+            } // repeat
         ]
     }
 }
@@ -1397,6 +1439,129 @@ GET /api.band/publicid/fan-list/?page=33
     ]
 }
 
+Vypis koncertu kapely publicid<br>
+Access: R<br>
+Status: online<br>
+Permissions: public, (venueExclusive, geoSearch)<br>
+GET /api.band/publicid/gig-list/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "url": "/api.band/publicid/fan-list/",
+    "total": 6,
+    "totalPages": 1,
+    "page": 1,
+    "pageSize": 10,
+    "items": [
+        {
+            "id": 2133493,
+            "type": "gig",
+            "url": "/api.gig/id/",
+            "webUrl": "http://bandzone.cz/akce/id",
+            "name": "25 LET REVOLTY",
+            "startDate": "2012-10-06",
+            "startTime": "20:00:00",
+            "endDate": null,
+            "endTime": null,
+            "entry": "190 Kč na místě",
+            "entryType": "C",    // C = custom (paid?), F = free, V = voluntary
+            "city": "Brno",
+            "venue": {
+                "id": 588685,
+                "type": "venue",
+                "url": "/api.venue/id/", // optional, if not provideded = no venue info
+                "name": "Fléda",
+                // only if URL provided
+                "street1": "Štefánikova 24",
+                "street2": "",
+                "city": "Brno",
+                "zip": "60200",
+                "lat": 49.2100761,  // venueExclusive only
+                "long": 16.6032350, // venueExclusive only
+                "externalUrl": "http://fleda.cz/",
+                "info": {   // venueExclusive only
+                    "budvar": true  // true/false
+                },
+                "distance": 543     // venueExclusive only: if geosearch: distance in meters from (lat, long)
+            },
+            "attending": "A",
+            "attendeeList": {   // preview of few items
+                "url": "/api.gig/id/attendee-list",
+                "total": 66,
+                "items": [
+                    {
+                        "id": 220842,
+                        "type": "fan",
+                        "url": "/api.fan/mikakoffin",
+                        "webUrl": "http://bandzone.cz/fan/mikakoffin",
+                        "name": "Mika Koffin",
+                        "gender": null,
+                        "age": 34,
+                        "city": "Brno",
+                        "image": {
+                            "small": {
+                                "url": "http://usr.bandzone.cz/fan/mi/mikakoffin/gallery/profile.default/612800_t_s.jpg"
+                            }
+                        }
+                    },
+                    {
+                        "id": 13222,
+                        "type": "fan",
+                        "url": "/api.fan/pepek/",
+                        "webUrl": "http://bandzone.cz/fan/pepek",
+                        "name": "pepek the new better person",
+                        "gender": "F",
+                        "age": 26,
+                        "city": "Praha",
+                        "image": {
+                            "small": {
+                                "url": "http://usr.bandzone.cz/fan/pe/pepek/gallery/profile.default/u5sfSs-Avz_baAToNcirCf28oDPp_LQi.jpg"
+                            }
+                        }
+                    }
+                ]
+            },
+            "bandList": {
+                "url": "/api.gig/id/band-list/",
+                "total": 2,
+                "items": [
+                    {
+                        "id": 104,
+                        "type": "band",
+                        "url": "/api.band/insania",
+                        "webUrl": "http://bandzone.cz/insania/",
+                        "name": "Insania",
+                        "genre": "post hardcore-metal",
+                        "city": "Brno",
+                        "image": {
+                            "small": {
+                                "url": "http://usr.bandzone.cz/band/in/insania/gallery/profile.default/V2sJ_D8m0ujWqb11mhbFiR0c1LzbXZR5.jpg"
+                            }
+                        }
+                    },
+                    {
+                        "id": 622,
+                        "type": "band",
+                        "url": "/api.band/nasrot/",
+                        "webUrl": "http://bandzone.cz/nasrot",
+                        "name": "Našrot",
+                        "genre": "hardcore-crossover",
+                        "city": "Havlíčkův Brod",
+                        "image": {
+                            "small": {
+                                "url": "http://usr.bandzone.cz/band/na/nasrot/gallery/profile.default/B3XMhWX6LDsejGGGfNU34uMi0tO1low0.jpg"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        // repeat
+    ]
+}
+
 Výpis kapel<br>
 Access: R<br>
 Status: online<br>
@@ -1485,7 +1650,7 @@ GET /api.track/45324/play/
 Vypise data akce id<br>
 Access: R<br>
 Status: online<br>
-Permissions: public|(venueExclusive)
+Permissions: public, (venueExclusive)
 GET /api.gig/id/
 > Client-Id: example
 > Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
