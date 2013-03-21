@@ -66,6 +66,15 @@ Při chybě 404 u POST requestů se vrací odpověď:
 --
 Changelog
 
+2013-03-21<br>
+- online: vypis koncertu pro kazdou kapelu<br>
+- online: GET /api.band-list/_all/<br>
+
+2013-03-19<br>
+- draft: vypis koncertu pro kazdou kapelu<br>
+- pridano allBands permission<br>
+- pridan draft: GET /api.band-list/_all/<br>
+
 2013-03-16<br>
 - draft: pridan vypis koncertu pro kazdou kapelu (GET /api.band/publicid/gig-list/) + nahled u kapely (GET /api.band/publicid/)<br>
 
@@ -1608,6 +1617,35 @@ GET /api.band-list/
             "image": {
                 "small": {
                     "url": "http://usr.bandzone.cz/band/na/nasrot/gallery/profile.default/B3XMhWX6LDsejGGGfNU34uMi0tO1low0.jpg"
+                }
+            }
+        },
+        // repeat
+    ]
+}
+
+Výpis všech kapel (aktualizován jednou denně)<br>
+Access: W<br>
+Status: online<br>
+Permissions: allBands
+GET /api.band-list/_all/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+< 200
+< Content-Type: application/json
+{
+    "total": 33864,
+    "items": [
+        {
+            "id": 104,
+            "type": "bandlink",
+            "webUrl": "http://bandzone.cz/kombucha?utm_source=uloz.to&utm_medium=link&utm_campaign=search&utm_term=",
+            "name": "Kombucha",
+            "genre": "aggro-psychedelic",
+            "city": "Praha",
+            "image": {
+                "small": {
+                    "url": "http://usr.bandzone.cz/band/ko/kombucha/gallery/profile.default/384269_t_s.jpg"
                 }
             }
         },
