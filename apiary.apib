@@ -66,6 +66,9 @@ Při chybě 404 u POST requestů se vrací odpověď:
 --
 Changelog
 
+2013-04-02<br>
+- draft: POST /api.recover-account/<br>
+
 2013-03-21<br>
 - online: vypis koncertu pro kazdou kapelu<br>
 - online: GET /api.band-list/_all/<br>
@@ -2397,6 +2400,24 @@ POST /api.fb-register/
         "url": "/api.session/03487c7b2673a260f68537d65f5b9d0e64864302/", // tady lze ziskat informace o session
         "user-token": "03487c7b2673a260f68537d65f5b9d0e64864302",
     }
+}
+
+-- Obnova hesla --
+
+Access: W<br>
+Status: draft<br>
+Permissions: userLogin
+POST /api.recover-account/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> Content-Type: application/json
+{
+    "login": "maximkrusina" // login nebo e-mail
+}
+< 200
+< Content-Type: application/json
+{
+    "email": "user@example.com" // e-mail, na ktery byla odeslana zadost o obnovu hesla - pokud byl pro obnovu pouzit login, e-mail se zde zobrazi vyhvezdickovany (to***.mu****@ba******.cz apod.)
 }
 
 -- Upload souborů --
