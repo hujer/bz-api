@@ -66,10 +66,14 @@ Při chybě 404 u POST requestů se vrací odpověď:
 --
 Changelog
 
-2013-04-03<br>
+2013-04-05<br>
+- online: POST/DELETE /api.gig/id/attendee-list/ deprecated -> POST/DELETE /api.fan/public/attending-list/
+- doc update: attending klic u GET /api.fan/publicid/attending-list/
+
+2013-04-04<br>
 - online: POST /api.recover-account/<br>
 
-2013-04-02<br>
+2013-03-04<br>
 - draft: POST /api.recover-account/<br>
 
 2013-03-21<br>
@@ -776,7 +780,7 @@ POST /api.fan/publicid/friend-list/
 > User-Token: 5cc3944e93fdf326886c8a225d59aa2e460954fc
 > Content-Type: application/json
 {
-    "id": 13290  // id fanouiska, ktereho chceme pridat do friend-listu fanouska publicid
+    "id": 13290  // id fanouska, ktereho chceme pridat do friend-listu fanouska publicid
 }
 < 201
 < Content-Type: application/json
@@ -863,7 +867,7 @@ GET /api.fan/publicid/membership-list/
 }
 
 
-Seznam akci, kam se chysta fan publicid
+Seznam akci, kam se chysta fan publicid. Pokud pouzijeme Access: S (prihlaseneho fanouska) a ptame se na vlastni seznam, dostaneme i akce jen v kalendari
 Access: R<br>
 Status: online<br>
 Permissions: public
@@ -899,7 +903,8 @@ GET /api.fan/publicid/attending-list/
                 "full": {
                     "url": "http://usr.bandzone.cz/fan/tr/trta/gallery/profile.default/Not3GryogCJI0qWVDMDo_rc6soPwaCpg.jpg"
                 }
-            }
+            },
+            "attending": "A"    // attendance vuci prihlasenemu uzivateli
         },
         {
             "id": 13189,
@@ -921,12 +926,61 @@ GET /api.fan/publicid/attending-list/
                 "full": {
                     "url" : "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/Y50pz4zZnn0SS0NMfgnX4w05xO7oGq5V.jpg"
                 }
-            }
+            },
+            "attending": "C"
         }
         // repeat
     ]
 }
 
+Pridani akce do kalendare fanouska<br>
+Access: S<br>
+Status: draft<br>
+Permissions: public
+POST /api.fan/publicid/attending-list/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> User-Token: 5cc3944e93fdf326886c8a225d59aa2e460954fc
+> Content-Type: application/json
+{
+    "id": 13290,  // id gigu, ktery chceme pridat do kalendare
+    "attendance": "A"   // "A" nebo vynechany klic: public attendance, "C": kalendar
+}
+< 201
+< Content-Type: application/json
+{
+    // info o fanouškovi, který se přidal
+    "id": 13190,
+    "type": "user",
+    "url": "/api.fan/publicid/", // API URL
+    "webUrl": "http://bandzone.cz/fan/publicid",    // web URL
+    "name": "User Name",    // jmeno = nick
+    "gender": "M",  // M, F, null
+    "age": 29,    // or null
+    "city": "Praha"    // or null
+}
+
+Smazani akce z kalendare fanouska<br>
+Access: S<br>
+Status: draft<br>
+Permissions: public
+DELETE /api.fan/publicid/attending-list/gigid/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> User-Token: 5cc3944e93fdf326886c8a225d59aa2e460954fc
+< 200
+< Content-Type: application/json
+{
+    // info o fanouškovi, který se přidal
+    "id": 13190,
+    "type": "user",
+    "url": "/api.fan/publicid/", // API URL
+    "webUrl": "http://bandzone.cz/fan/publicid",    // web URL
+    "name": "User Name",    // jmeno = nick
+    "gender": "M",  // M, F, null
+    "age": 29,    // or null
+    "city": "Praha"    // or null
+}
 
 Zjisteni stavu odberu<br>
 Access: S<br>
@@ -1932,7 +1986,7 @@ GET /api.gig/id/attendee-list/?page=1
 
 Pridani fanouska na attendee-list akce
 Access: S<br>
-Status: online<br>
+Status: DEPRECATED, use POST /api.fan/publicid/attendind-list/<br>
 Permissions: userLogin
 POST /api.gig/id/attendee-list/
 > Client-Id: example
@@ -1946,9 +2000,9 @@ POST /api.gig/id/attendee-list/
 < 201
 < Content-Type: application/json
 {
-    // info o fanouškovi, který se přidal - TODO: lépe info o gigu?
+    // info o fanouškovi, který se přidal
     "id": 13190,
-    "type": "fan",
+    "type": "user",
     "url": "/api.fan/publicid/", // API URL
     "webUrl": "http://bandzone.cz/fan/publicid",    // web URL
     "name": "User Name",    // jmeno = nick
@@ -1959,7 +2013,7 @@ POST /api.gig/id/attendee-list/
 
 Smazani fanouska z attendee-listu akce
 Access: S<br>
-Status: online+TODO<br>
+Status: DEPRECATED, use DELETE /api.fan/publicid/attending-list/<br>
 Permissions: userLogin
 DELETE /api.gig/id/attendee-list/13222/
 > Client-Id: example
@@ -1968,9 +2022,9 @@ DELETE /api.gig/id/attendee-list/13222/
 < 200
 < Content-Type: application/json
 {
-	// info o fanouškovi, který se přidal - TODO: lépe info o gigu?
+	// info o fanouškovi, který se přidal
     "id": 13190,
-    "type": "fan",
+    "type": "user",
     "url": "/api.fan/publicid/", // API URL
     "webUrl": "http://bandzone.cz/fan/publicid",    // web URL
     "name": "User Name",    // jmeno = nick
