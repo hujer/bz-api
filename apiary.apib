@@ -42,10 +42,21 @@ Facebook registrace fanouška
 --
 Registrace probíhá POST requestem na /api.fb-register/, potřebujeme facebookové user Id a access token. Server si zavolá facebook API a vyžádá si zbytek informací. Access token musí mít povoleno získat e-mail, pokud ho FB API nevrátí, nastane chyba.
 
+Diagram zde: https://www.lucidchart.com/documents/edit/49ad-98ac-52010fa8-9964-3c650a000ef3
+
+Chyba muze byt 400 (obecna, potom odpoved viz nize), nebo:
+
+<ul>
+    <li>422 Unprocessable Entity: znamena, ze FB vratil v poli "email" neco jineho, nez mail a je potreba znovu zavolat POST /api.fb-register/ s klicem "email". Toto je mozne detekovat, pokud mate FB info o uzivateli dostupne na zarizeni a ten e-mail posilat rovnou.
+    </li>
+    <li>402 Payment Required: znamena, ze ucet je zablkovany a uzivatele odmitame prihlasit. Typicky se jedna o spammery, kterym chceme zamezit v pristupu k BZ.</li>
+</ul>
+
+Pri posilani klice "email" muze volani odpovedet kodem 202 Accepted, coz znamena, ze na zadany e-mail jsme poslali zpravu s potvrzovacim kodem.
 
 Error responses
 --
-Při chybě 404 u POST requestů se vrací odpověď:
+Při chybě 400 u POST requestů se vrací odpověď:
 <pre>
 {
     "errors": [
@@ -54,8 +65,12 @@ Při chybě 404 u POST requestů se vrací odpověď:
     ],
     "fields": {
         "klic1": "Popis chyby na klic1",
-        "login": "Key login must be at least 3 characters long"
+        "login": "Key login already exists in database"
     },
+    "types": {
+        "klic1": "invalid",     // muze byt "missing" - pole neni vyplneno, "invalid" - pole je vyplneno, ale ma spatny format
+        "login": "duplicate"    // "duplicate" - obsah pole musi byt unikatni a neni, "nonexistent" - pole se musi odvolavat na platnou hodnotu a nema ji
+    }.
     "http": {
         "code": 400,    // repeated HTTP status code
         "message": "Validation failed." // repeated HTTP status message
@@ -65,6 +80,10 @@ Při chybě 404 u POST requestů se vrací odpověď:
 
 --
 Changelog
+
+2013-08-06<br>
+- draft: "types" index pri chybove odpovedi k indikaci typu chyby na klicich
+- draft: fb registrace: reseni pripadu, kdy FB neposle e-mail, nebo kdyz je e-mail duplicitni (POST /api.fb-register/)
 
 2013-04-05<br>
 - online: POST/DELETE /api.gig/id/attendee-list/ deprecated -> POST/DELETE /api.fan/public/attending-list/<br>
@@ -183,7 +202,7 @@ Changelog
 - Online oblíbené kapely: POST /api.fan/publicid/favorite-band-list/, DELETE /api.fan/publicid/favorite-band-list/<br>
 - Online friends: POST /api.fan/publicid/friend-list/, DELETE /api.fan/publicid/friend-list/<br>
 - Online gig attendees: GET /api.gig/id/attendee-list/<br>
-- Online Gig attendance: POST /api.gig/id/attendee-list/, DELETE /api.gig/id/attendee-list/<br>
+- Online gig attendance: POST /api.gig/id/attendee-list/, DELETE /api.gig/id/attendee-list/<br>
 
 2012-11-26<br>
 - Zprovozněno HTTPS<br>
@@ -2458,6 +2477,84 @@ POST /api.fb-register/
         "user-token": "03487c7b2673a260f68537d65f5b9d0e64864302",
     }
 }
+
+Vytvoření účtu, pokud od FB nepřišel e-mail<br>
+Access: W<br>
+Status: draft<br>
+Permissions: userRegistration
+POST /api.fb-register/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> Content-Type: application/json
+{
+    "userId": "629018629",    // FB id uživatele
+    "accessToken": "AAABrOKqhkPgBAJvJGrSYh7zU2lNNE5iYD7IKL7T6Cm3sZAbp4QZA6MWPDwRJvdZAW1e513bssIuNxwJJ9gNasrxKLh78jda04aK4gYB8QZDZD",    // FB access token
+    "temp": 1,    // pro temp registraci (smazani po peti minutach), tempRegistration permission potreba
+    "loginIfExists": 1, // pokud nastaveno a dany uzivatel v db jiz existuje, nevyhodime chybovou hlasku, ale tise ho prihlasime
+    "email": "hujer@bandzone.cz"    // klic email k urceni e-mailu
+}
+< 201
+< Content-Type: application/json
+{
+    "user": {
+        "id": 13190,
+        "type": "user",
+        "url": "/api.fan/publicid/", // API URL
+        "webUrl": "http://bandzone.cz/fan/publicid",    // web URL
+        "name": "User Name",    // jmeno = nick
+        "gender": "M",  // M, F, null
+        "age": 29,    // or null
+        "city": "Praha",    // or null
+        "friend": true,     // pouze pokud je prihlaseny uzivatel
+        "mutual": false,    // -- " --
+        "image": {
+            "small": {
+                "url": "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/dT9BOUxUeJ9mBLLT3G-0mLE3fX6KWyyf.jpg"
+            }
+        }
+    },
+    "session": {
+        "url": "/api.session/03487c7b2673a260f68537d65f5b9d0e64864302/", // tady lze ziskat informace o session
+        "user-token": "03487c7b2673a260f68537d65f5b9d0e64864302",
+    }
+}
+
+Chybová odpověď pro účet, kde potřebujeme heslo ke spárování<br>
+Access: W<br>
+Status: draft<br>
+Permissions: userRegistration
+POST /api.fb-register/
+> Client-Id: example
+> Client-Key: 6ba5133343599ae84d54ebf9776439e28105c691
+> Content-Type: application/json
+{
+    "userId": "629018629",    // FB id uživatele
+    "accessToken": "AAABrOKqhkPgBAJvJGrSYh7zU2lNNE5iYD7IKL7T6Cm3sZAbp4QZA6MWPDwRJvdZAW1e513bssIuNxwJJ9gNasrxKLh78jda04aK4gYB8QZDZD",    // FB access token
+    "temp": 1,    // pro temp registraci (smazani po peti minutach), tempRegistration permission potreba
+    "loginIfExists": 1, // pokud nastaveno a dany uzivatel v db jiz existuje, nevyhodime chybovou hlasku, ale tise ho prihlasime
+}
+< 401 Unauthorized
+< Content-Type: application/json
+{
+    "user": {
+        "id": 13190,
+        "type": "user",
+        "url": "/api.fan/publicid/", // API URL
+        "webUrl": "http://bandzone.cz/fan/publicid",    // web URL
+        "name": "User Name",    // jmeno = nick
+        "gender": "M",  // M, F, null
+        "age": 29,    // or null
+        "city": "Praha",    // or null
+        "friend": true,     // pouze pokud je prihlaseny uzivatel
+        "mutual": false,    // -- " --
+        "image": {
+            "small": {
+                "url": "http://usr.bandzone.cz/fan/ma/majklac/gallery/profile.default/dT9BOUxUeJ9mBLLT3G-0mLE3fX6KWyyf.jpg"
+            }
+        }
+    },
+}
+
 
 -- Obnova hesla --
 
